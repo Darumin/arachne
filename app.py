@@ -18,6 +18,7 @@ class Noun:
         if given_kind in valid_descriptions: return given_kind[:3]
         raise KeyError(f"'{given_kind}' not valid kind.")
 
+    # TODO: Is the repetitive structure below necessary?
     @staticmethod
     def validate_container(container_name):
         return True if isinstance(container_name, Container) else False
@@ -33,21 +34,23 @@ class Container(Noun):
 
         self.contents = dict()
 
+    def __repr__(self):
+        return str(self.contents)
+
     def add_item(self, item):
         # TODO: Maybe lump methods together.
-        if not self.validate_item(item): return
+        if not self.validate_item(item):
+            return
         self.contents[item] = f'{item.name.capitalize()} is here.'
 
     def remove_item(self, item):
         # TODO: Clean this, somewhat.
-        if not self.validate_item(item): return
+        if not self.validate_item(item):
+            return
         try:
             self.contents.get(item.name)
         finally:
             self.contents.pop(item.name)
-
-    def __repr__(self):
-        return str(self.contents)
 
 
 class Item(Noun):
@@ -66,6 +69,7 @@ class Room(Container):
         # TODO: Takes a Room object for a key, with optional description.
 
     def __repr__(self) -> str:
+        # TODO: Probably need to move this to a separate function.
         room_desc = self.texts['obs']
         props = ''
         for item in self.contents:
