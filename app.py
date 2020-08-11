@@ -1,64 +1,74 @@
 class Noun:
-    def __init__(self, name: str, description: str):
+    def __init__(self, name):
         self.name = name
-        self.description = description
+        self.texts = dict()
 
-    def __repr__(self):
-        pass
+    def add_description(self, kind, text):
+        key = self.validate_description_kind(kind)
+        self.texts[key] = text
+        print(kind.capitalize() + f' has been set with key [{key}].')
 
-
-class Item(Noun):
-    def __init__(self, item_name: str, item_desc: str):
-        super().__init__(item_name, item_desc)
-
-        self.can_be_used = False
-        self.is_not_possessed = True
-        self.description_dict = {
-            'item_desc': item_desc,
-            'not_carrying': f'{item_name} is here.',
-            'carrying': f'You are carrying {item_name.lower()}.'
+    @staticmethod
+    def validate_description_kind(given_kind):
+        valid_descriptions = {
+            'observation',
+            'placement'
         }
 
-        self.current_location_desc = self.description_dict['not_carrying']
+        if given_kind in valid_descriptions: return given_kind[:3]
+        raise KeyError(f"'{given_kind}' not valid kind.")
 
-    def return_desc(self, key: str) -> str:
-        return self.description_dict.get(key)
+    @staticmethod
+    def validate_container(container_name):
+        return True if isinstance(container_name, Container) else False
 
-    def set_new_location_description(self, description: str):
-        self.current_location_desc = description
+    @staticmethod
+    def validate_item(item_name):
+        return True if isinstance(item_name, Item) else False
 
 
 class Container(Noun):
-    def __init__(self, true_name, description):
-        super().__init__(true_name, description)
+    def __init__(self, name):
+        super().__init__(name)
 
         self.contents = dict()
 
-    def __repr__(self):
-        pass
+    def add_item(self, item):
+        # TODO: Maybe lump methods together.
+        if not self.validate_item(item): return
+        self.contents[item] = f'{item.name.capitalize()} is here.'
 
-    def add_item(self, item_name):
-        pass
+    def remove_item(self, item):
+        # TODO: Clean this, somewhat.
+        if not self.validate_item(item): return
+        try:
+            self.contents.get(item.name)
+        finally:
+            self.contents.pop(item.name)
+
+    def __repr__(self):
+        return str(self.contents)
+
+
+class Item(Noun):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def __repr__(self):
+        return str(self.texts)
 
 
 class Room(Container):
-    def __init__(self, true_name: str, description: str):
-        super().__init__(true_name, description)
+    def __init__(self, name):
+        super().__init__(name)
+
+        compass_rose = dict()
+        # TODO: Takes a Room object for a key, with optional description.
 
     def __repr__(self) -> str:
-        set_pieces = ''
+        room_desc = self.texts['obs']
+        props = ''
         for item in self.contents:
-            set_pieces += str(item.current_location_desc) + ' '
-        return str(self.name + '\n' + self.description + ' ' + set_pieces)
+            props += ' ' + item.texts['pla']
 
-    def store_item(self, item: Item, description: str = None):
-        if not description:
-            if item.is_not_possessed:
-                default_desc = item.return_desc('not_carrying')
-            else:
-                default_desc = item.return_desc('carrying')
-        else:
-            default_desc = description
-
-        self.contents[item] = default_desc
-        item.set_new_location_description(default_desc)
+        return room_desc + props
