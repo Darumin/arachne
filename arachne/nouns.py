@@ -1,3 +1,4 @@
+# This is a reference for all Nouns or objects/set pieces found in the game.
 # TODO: Reevaluate whether strict exceptions are needed here.
 
 
