@@ -1,10 +1,18 @@
-# This is the reference for all actions in the game. Arachne actions are
-# defined according to a single input/output architecture.
+# TODO: have actions DO something.
+# TODO: Some actions must be able to receive tokens to customize default strings.
 
-from arachne.nouns import Noun
+from arachne.verbs import Verb
+from arachne.nouns import Item
 
 
-class Player(Noun):
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
-        # TODO: Clean up actions
+def publish_action(action: Verb) -> None:
+    if action is Verb.TAKE: Action.take()
+    if action is Verb.EXAMINE: pass
+
+
+class Action:
+    @staticmethod
+    def take(item: Item = None):
+        if not item:
+            return "There is nothing to take."
+        return f"You take {item.name}"
