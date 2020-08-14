@@ -1,4 +1,3 @@
-# TODO: Get rid of all exceptions.
 # TODO: Create a player, and an inventory.
 
 
@@ -21,7 +20,6 @@ class Noun:
 
         if given_kind in valid_descriptions:
             return given_kind[:3]
-        raise ValueError(f"'{given_kind}' not valid kind.")
 
 
 class Item(Noun):
@@ -41,20 +39,10 @@ class Container(Noun):
     def __repr__(self) -> str:
         return str(self.contents)
 
-    @staticmethod
-    def _valid_item(item: Item) -> bool:
-        return True if isinstance(item, Item) else False
-
     def add_item(self, item: Item) -> None:
-        if not self._valid_item(item):
-            raise TypeError(f"Attempted to add '{item}' ({type(item)}). It is not valid [Item]!")
-
         self.contents[item] = f'{item.name.capitalize()} is here.'
 
     def remove_item(self, item: Item) -> None:
-        if not self._valid_item(item):
-            raise TypeError(f"Given '{item}' is not desired type. Keys are of type [Item]!")
-
         try:
             self.contents.pop(item)
         except KeyError:
@@ -65,15 +53,18 @@ class Room(Container):
     def __init__(self, name: str) -> None:
         super().__init__(name)
 
-        compass_rose = dict()
-        # TODO: Takes a Room object for a key, with optional description.
+        # TODO: adjacents = dict()
+        # TODO: Should list all adjacent rooms.
 
     def __repr__(self) -> str:
-        # TODO: Probably need to move this to a separate function.
-        # This should instead return a debugger representation.
-        room_desc = self.texts['obs']
-        props = ''
-        for item in self.contents:
-            props += ' ' + item.texts['pla']
+        return f"Room object with title: '{self.name}'"
 
-        return room_desc + props
+    def __len__(self) -> int:
+        return self.contents.__len__()
+
+    def describe_room(self) -> str:
+        room_desc = self.texts['obs']
+        for item in self.contents:
+            room_desc += ' ' + item.texts['pla']
+
+        return room_desc

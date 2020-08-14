@@ -1,3 +1,5 @@
+from arachne.verbs import Verb
+
 import string
 
 
