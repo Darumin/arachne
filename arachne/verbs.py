@@ -1,11 +1,13 @@
-"""
-This is a list of all verbs in a given game.
-
-Verb is a container class that inherits from Enum, which renders these as constants of type Verb.
-The values are unused and serve as a form of documentation. Constants are used in equality checks.
-"""
-
 from enum import Enum
+
+"""
+This is a list of Arachne's default verbs.
+
+"Verb" is a container using class syntax and subclasses Enum.
+The resulting Verb-type constants are used for equality checks and 
+guarding against errors in noun interaction. The string values are 
+unused and serve primarily as documentation.
+"""
 
 
 class Verb(Enum):
