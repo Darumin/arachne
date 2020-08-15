@@ -4,6 +4,7 @@
 from arachne.lexer import tokenize
 from arachne.game import Game as g
 from arachne.verbs import Verb
+from arachne.nouns import Player, Item
 
 
 def write_action(input_str: str) -> None:
@@ -17,10 +18,16 @@ def write_action(input_str: str) -> None:
 
 class Parser:
     @staticmethod
-    def take(subject_str: str):
-        if not subject_str:
-            return "No such subject."
-        return f"You take the {subject_str}"
+    def take(subject_pair: tuple) -> str:
+        header, subject = subject_pair
+        if header is False:
+            return f"This isn't available -> '{subject}'"
+        if subject in Player.get_ids():
+            return f"{subject.name} is already in your posession."
+
+        Player.store(subject)
+        print(Player.inventory())
+        return f"You take the {subject.name}."
 
     @staticmethod
     def scan_vicinity():

@@ -41,7 +41,7 @@ class Item(Noun):
         super().__init__(name)
 
     def __repr__(self) -> str:
-        return "Item: " + str(id(self))
+        return "Item-> " + str(id(self))
 
 
 class Container(Noun):
@@ -71,7 +71,7 @@ class Room(Container):
         # TODO: Should list all adjacent rooms.
 
     def __repr__(self) -> str:
-        return "Room: " + str(id(self))
+        return "Room-> " + str(id(self))
 
     def __len__(self) -> int:
         return self.contents.__len__()
@@ -82,3 +82,21 @@ class Room(Container):
             room_desc += ' ' + item.texts['pla']
 
         return room_desc
+
+
+class Player(Noun):
+    _inventory = dict()
+
+    @staticmethod
+    def store(item_obj: Item):
+        Player._inventory[item_obj.name] = item_obj
+
+    @staticmethod
+    def inventory() -> dict:
+        return Player._inventory
+
+    @staticmethod
+    def get_ids():
+        return Player._inventory.values()
+
+

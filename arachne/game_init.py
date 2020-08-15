@@ -5,5 +5,7 @@ from arachne.parser import write_action
 class GameInit:
     @staticmethod
     def main_game_loop():
-        command = input(">")
-        write_action(command)
+        while True:
+            command = input(">")
+            if command == "quit()": break
+            write_action(command)

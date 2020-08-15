@@ -1,6 +1,6 @@
 # TODO: note to self, remember to convert to lowercase
 from arachne.verbs import Verb
-from arachne.nouns import Noun
+from arachne.nouns import Noun, Item
 import re
 
 
@@ -52,28 +52,28 @@ def _determine_verb(given_verb: str) -> Verb:
 
 
 # TODO: Expand this
-def _determine_subject(given_subject: str = None):
+def _determine_subject(given_subject: str = None) -> tuple:
     results = []
 
     for obj in Noun.get_objects():
-        if obj.can_be_got:
-            search = re.search(given_subject, obj.name)
-            if search: results.append(obj)
+        # apply given pattern to all instances, add to a list (results) if matched
+        search = re.search(given_subject, obj.name)
+        if search: results.append(obj)
+
+    print(results)
 
     if len(results) == 0:
-        return None
+        # in the case that no such string can be matched; subject doesn't exist
+        return False, given_subject
 
     if len(results) > 1:
+        # in the case that more than one item that matches given_subject, process all matches
         print("Which one?")
-        for obj in enumerate(results, start=1):
+        for obj in enumerate(results, start = 1):
             # TODO: Pass results to a function to parse options.
             print(f"{obj[0]})", obj[1].name, end=" ")
 
-    return results[0].name
-
-
-def _trim_articles(given_str: str) -> str:
-    # TODO: perform regex replace
-    pass
+    # finally return found object
+    return True, results[0]
 
 
