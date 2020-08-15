@@ -2,6 +2,7 @@ from arachne.nouns import Noun
 
 
 class Game:
+    # TODO: When I finally do the main game loop, this should be initialized as beginning room.
     _player_location = None
 
     @staticmethod

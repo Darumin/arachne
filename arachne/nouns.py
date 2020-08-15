@@ -1,6 +1,3 @@
-# TODO: Create a player, and an inventory.
-
-
 class Noun:
     _noun_ids = []
 
@@ -10,6 +7,10 @@ class Noun:
 
         # Build a list of unique object IDs.
         self._noun_ids.append(self)
+
+    @property
+    def can_be_got(self):
+        return True if isinstance(self, Item) else False
 
     def add_description(self, kind: str, text: str) -> None:
         key: str = self.validate_description_kind(kind)
@@ -40,7 +41,7 @@ class Item(Noun):
         super().__init__(name)
 
     def __repr__(self) -> str:
-        return str(self.texts)
+        return "Item: " + str(id(self))
 
 
 class Container(Noun):

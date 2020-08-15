@@ -1,15 +1,16 @@
 # TODO: note to self, remember to convert to lowercase
 from arachne.verbs import Verb
+from arachne.nouns import Noun
 import re
 
 
 # This tuple of tuples displays acceptable synonym regexes of each default action verb.
 verb_lexicon = (
     (Verb.TAKE,      "^take$|^get$|^pick up$"),
-    (Verb.DROP,      ""),
+    (Verb.DROP,      "^drop$"),
     (Verb.EXAMINE,   "^x |^check |^examine "),
-    (Verb.PUT,       ""),
-    (Verb.INVENTORY, "")
+    (Verb.PUT,       "^put$"),
+    (Verb.INVENTORY, "^i$|^inventory$")
 )
 
 
@@ -51,8 +52,28 @@ def _determine_verb(given_verb: str) -> Verb:
 
 
 # TODO: Expand this
-def _determine_subject(given_subject: str = None) -> str:
-    return given_subject
+def _determine_subject(given_subject: str = None):
+    results = []
 
+    for obj in Noun.get_objects():
+        if obj.can_be_got:
+            search = re.search(given_subject, obj.name)
+            if search: results.append(obj)
+
+    if len(results) == 0:
+        return None
+
+    if len(results) > 1:
+        print("Which one?")
+        for obj in enumerate(results, start=1):
+            # TODO: Pass results to a function to parse options.
+            print(f"{obj[0]})", obj[1].name, end=" ")
+
+    return results[0].name
+
+
+def _trim_articles(given_str: str) -> str:
+    # TODO: perform regex replace
+    pass
 
 
