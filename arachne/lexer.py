@@ -1,7 +1,9 @@
+# TODO: note to self, remember to convert to lowercase
 from arachne.verbs import Verb
 import re
 
 
+# This tuple of tuples displays acceptable synonym regexes of each default action verb.
 verb_lexicon = (
     (Verb.TAKE,      "^take$|^get$|^pick up$"),
     (Verb.DROP,      ""),
@@ -18,11 +20,16 @@ def tokenize(given_str: str):
     subject = _determine_subject(b)
     return verb, subject
 
-# Following are private functions in the Pythonic sense.
+
+#
+##
+### Following are private functions in the Pythonic sense.
+##
+#
 
 
 # If input is a lone verb, no subject flag is raised
-# and the appropriate event is executed.
+# and the case for lone verbs is passed.
 def _split_keywords(given_str: str) -> tuple:
     split_input = given_str.split(' ', 1)
 
@@ -33,7 +40,8 @@ def _split_keywords(given_str: str) -> tuple:
     return tuple(split_input)
 
 
-# Pattern regex for given verb, then return matching Verb enum for parsing.
+# Searches for pattern in verb, returns NULL keyword if unrecognized.
+# If recognized, returns "head" of the Verb object, Regex tuple.
 def _determine_verb(given_verb: str) -> Verb:
     for entry in verb_lexicon:
         match = re.search(entry[1], given_verb)
@@ -42,7 +50,7 @@ def _determine_verb(given_verb: str) -> Verb:
     return Verb.NULL
 
 
-#TODO: Expand this
+# TODO: Expand this
 def _determine_subject(given_subject: str = None) -> str:
     return given_subject
 

@@ -1,8 +1,8 @@
 from enum import Enum
 
-"""
-This is a list of Arachne's default verbs.
-"""
+##
+### This is a list of Arachne's default verbs.
+##
 
 
 class Verb(Enum):

@@ -2,9 +2,14 @@
 
 
 class Noun:
+    _noun_ids = []
+
     def __init__(self, name: str) -> None:
         self.name: str = name
         self.texts: dict = dict()
+
+        # Build a list of unique object IDs.
+        self._noun_ids.append(self)
 
     def add_description(self, kind: str, text: str) -> None:
         key: str = self.validate_description_kind(kind)
@@ -20,6 +25,14 @@ class Noun:
 
         if given_kind in valid_descriptions:
             return given_kind[:3]
+
+    @staticmethod
+    def length_of_ids() -> int:
+        return len(Noun._noun_ids)
+
+    @staticmethod
+    def get_objects() -> list:
+        return Noun._noun_ids
 
 
 class Item(Noun):
@@ -57,7 +70,7 @@ class Room(Container):
         # TODO: Should list all adjacent rooms.
 
     def __repr__(self) -> str:
-        return f"Room object with title: '{self.name}'"
+        return "Room: " + str(id(self))
 
     def __len__(self) -> int:
         return self.contents.__len__()
