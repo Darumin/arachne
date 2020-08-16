@@ -1,5 +1,5 @@
 # TODO: note to self, remember to convert to lowercase
-from arachne.verbs import Verb
+from arachne.lingo import Verb
 from arachne.game import Game
 import re
 
@@ -8,9 +8,9 @@ import re
 verb_lexicon = (
     (Verb.TAKE,      "^take$|^get$|^pick up$"),
     (Verb.DROP,      "^drop$"),
-    (Verb.EXAMINE,   "^x |^check |^examine "),
-    (Verb.PUT,       "^put$"),
-    (Verb.INVENTORY, "^i$|^inventory$")
+    (Verb.EXAMINE,   "^x$|^check$|^examine$"),
+    (Verb.PUT,       "^put$|^store$"),
+    (Verb.INVENTORY, "^i$|^inventory$|^inv$")
 )
 
 
@@ -60,7 +60,7 @@ def _determine_subject(given_subject: str = None) -> tuple:
     # in the case that a lone verb is inputted
     if subject == "": return True, None
 
-    for obj in Game.get_objects():
+    for obj in Game.ids():
         for pattern in _derive_patterns(obj):
             search = re.search(pattern, subject)
             if search: results.append(obj)

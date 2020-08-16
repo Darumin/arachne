@@ -1,4 +1,5 @@
 from arachne.game import Game
+from arachne.lingo import Desc
 
 
 class Noun:
@@ -6,27 +7,15 @@ class Noun:
         self.name: str = name
         self.texts: dict = dict()
 
+        self.gettable: bool = False
+
         # Build a list of unique object IDs.
         Game.add_noun(self)
 
-    @property
-    def can_be_got(self) -> bool:
-        return True if isinstance(self, Item) else False
-
-    def add_description(self, kind: str, text: str) -> None:
-        key: str = self.validate_description_kind(kind)
-        self.texts[key]: str = text
-        print(kind.capitalize() + f' has been set with key [{key}].')
-
-    @staticmethod
-    def validate_description_kind(given_kind: str) -> str:
-        valid_descriptions: set = {
-            'observation',
-            'placement'
-        }
-
-        if given_kind in valid_descriptions:
-            return given_kind[:3]
+    def add_description(self, kind: Desc, text: str) -> None:
+        if kind in Desc:
+            self.texts[kind]: str = text
+            print(f"description of kind: {kind} has been set for {self}.")
 
 
 class Item(Noun):
@@ -70,16 +59,17 @@ class Room(Container):
         return self.contents.__len__()
 
     def describe_room(self) -> str:
-        room_desc = self.texts['obs']
+        room_desc = self.name + "\n" + self.texts[Desc.SELF]
+        room_desc += "\n\n"
         for item in self.contents:
-            room_desc += ' ' + item.texts['pla']
+            room_desc += item.texts[Desc.PLACEMENT] + ' '
 
         return room_desc
 
 
 class Player(Noun):
-    _inventory = dict()
-    _player_location = Game.get_location()
+    _inventory: dict = dict()
+    _player_location: Room = Game.start
 
     @property
     def inventory(self) -> dict:

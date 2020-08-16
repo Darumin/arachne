@@ -3,7 +3,7 @@
 
 from arachne.lexer import tokenize
 from arachne.game import Game as g
-from arachne.verbs import Verb
+from arachne.lingo import Verb
 from arachne.nouns import Player
 
 
@@ -38,8 +38,7 @@ class Parser:
 
     @staticmethod
     def scan_vicinity():
-        loc = g.get_location()
-        return loc
+        pass
 
     @staticmethod
     def lecture_player() -> str:
