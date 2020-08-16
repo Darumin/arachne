@@ -1,15 +1,16 @@
-class Noun:
-    _noun_ids = []
+from arachne.game import Game
 
+
+class Noun:
     def __init__(self, name: str) -> None:
         self.name: str = name
         self.texts: dict = dict()
 
         # Build a list of unique object IDs.
-        self._noun_ids.append(self)
+        Game.add_noun(self)
 
     @property
-    def can_be_got(self):
+    def can_be_got(self) -> bool:
         return True if isinstance(self, Item) else False
 
     def add_description(self, kind: str, text: str) -> None:
@@ -26,14 +27,6 @@ class Noun:
 
         if given_kind in valid_descriptions:
             return given_kind[:3]
-
-    @staticmethod
-    def length_of_ids() -> int:
-        return len(Noun._noun_ids)
-
-    @staticmethod
-    def get_objects() -> list:
-        return Noun._noun_ids
 
 
 class Item(Noun):
@@ -86,14 +79,15 @@ class Room(Container):
 
 class Player(Noun):
     _inventory = dict()
+    _player_location = Game.get_location()
+
+    @property
+    def inventory(self) -> dict:
+        return self._inventory
 
     @staticmethod
     def store(item_obj: Item):
         Player._inventory[item_obj.name] = item_obj
-
-    @staticmethod
-    def inventory() -> dict:
-        return Player._inventory
 
     @staticmethod
     def get_ids():

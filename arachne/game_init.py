@@ -7,5 +7,5 @@ class GameInit:
     def main_game_loop():
         while True:
             command = input(">")
-            if command == "quit()": break
+            if command == "quit": break
             write_action(command)

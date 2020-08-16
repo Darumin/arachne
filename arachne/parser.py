@@ -4,10 +4,13 @@
 from arachne.lexer import tokenize
 from arachne.game import Game as g
 from arachne.verbs import Verb
-from arachne.nouns import Player, Item
+from arachne.nouns import Player
 
 
 def write_action(input_str: str) -> None:
+    # TODO: future implementation, 'if' structure should return rather than print()
+    # TODO: This should pipeline to the GUI. Change return type as well.
+
     lowered = input_str.lower()
     verb, subject = tokenize(lowered)
 
@@ -20,6 +23,10 @@ class Parser:
     @staticmethod
     def take(subject_pair: tuple) -> str:
         header, subject = subject_pair
+
+        if subject is None:
+            # TODO: far future, please add implicit taking, i.e. "take {last_interacted}"
+            return "Please specify what you want to take."
         if header is False:
             return f"This isn't available -> '{subject}'"
         if subject in Player.get_ids():
@@ -27,7 +34,7 @@ class Parser:
 
         Player.store(subject)
         print(Player.inventory())
-        return f"You take the {subject.name}."
+        return f"You take {subject.name}."
 
     @staticmethod
     def scan_vicinity():

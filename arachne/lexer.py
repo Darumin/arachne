@@ -1,6 +1,6 @@
 # TODO: note to self, remember to convert to lowercase
 from arachne.verbs import Verb
-from arachne.nouns import Noun, Item
+from arachne.game import Game
 import re
 
 
@@ -35,8 +35,8 @@ def _split_keywords(given_str: str) -> tuple:
     split_input = given_str.split(' ', 1)
 
     if len(split_input) == 1:
-        a = str(split_input)
-        b = "NO SUBJECT"
+        a = str(split_input[0])
+        b = ""
         return a, b
     return tuple(split_input)
 
@@ -51,20 +51,25 @@ def _determine_verb(given_verb: str) -> Verb:
     return Verb.NULL
 
 
-# TODO: Expand this
 def _determine_subject(given_subject: str = None) -> tuple:
+    # TODO: trim articles here, refactor rename given_subject
+    subject = _trim_article(given_subject)
+    print(f"{subject} has been trimmed")
     results = []
 
-    for obj in Noun.get_objects():
-        # apply given pattern to all instances, add to a list (results) if matched
-        search = re.search(given_subject, obj.name)
-        if search: results.append(obj)
+    # in the case that a lone verb is inputted
+    if subject == "": return True, None
+
+    for obj in Game.get_objects():
+        for pattern in _derive_patterns(obj):
+            search = re.search(pattern, subject)
+            if search: results.append(obj)
 
     print(results)
 
     if len(results) == 0:
         # in the case that no such string can be matched; subject doesn't exist
-        return False, given_subject
+        return False, subject
 
     if len(results) > 1:
         # in the case that more than one item that matches given_subject, process all matches
@@ -77,3 +82,23 @@ def _determine_subject(given_subject: str = None) -> tuple:
     return True, results[0]
 
 
+def _trim_article(given_str: str) -> str:
+    # Did you know? That articles are actually adjectives;
+    # they describe the nouns they precede.
+    articles = "a|an|the|some"
+    matched = re.match(articles, given_str)
+    if matched:
+        index = matched.end()
+        return _trim_article(given_str[index + 1:])
+
+    return given_str
+
+
+def _derive_patterns(subject) -> list:
+    _split = subject.name.split()
+    _patterns = []
+    for keyword in _split:
+        key_str = "^" + keyword + "$"
+        _patterns.append(key_str)
+
+    return _patterns
