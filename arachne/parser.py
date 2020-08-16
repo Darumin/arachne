@@ -2,9 +2,8 @@
 # TODO: open containers
 
 from arachne.lexer import tokenize
-from arachne.game import Game as g
+from arachne.game import Player
 from arachne.lingo import Verb
-from arachne.nouns import Player
 
 
 def write_action(input_str: str) -> None:
@@ -14,12 +13,18 @@ def write_action(input_str: str) -> None:
     lowered = input_str.lower()
     verb, subject = tokenize(lowered)
 
+    if verb is Verb.LOOK: print(Parser.look())
     if verb is Verb.TAKE: print(Parser.take(subject))
     if verb is Verb.EXAMINE: pass
     if verb is Verb.NULL: print(Parser.lecture_player())
 
 
 class Parser:
+    @staticmethod
+    def look() -> str:
+        surroundings = Player.location()
+        return surroundings.describe_room()
+
     @staticmethod
     def take(subject_pair: tuple) -> str:
         header, subject = subject_pair
@@ -33,7 +38,7 @@ class Parser:
             return f"{subject.name} is already in your posession."
 
         Player.store(subject)
-        print(Player.inventory())
+        subject.free_item()
         return f"You take {subject.name}."
 
     @staticmethod

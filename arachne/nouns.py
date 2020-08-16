@@ -7,6 +7,7 @@ class Noun:
         self.name: str = name
         self.texts: dict = dict()
 
+        self.keywords = self.name.split()
         self.gettable: bool = False
 
         # Build a list of unique object IDs.
@@ -22,8 +23,20 @@ class Item(Noun):
     def __init__(self, name: str) -> None:
         super().__init__(name)
 
+        self._parent_container = None
+
     def __repr__(self) -> str:
         return "Item-> " + str(id(self))
+
+    def set_parent(self, container_obj):
+        self._parent_container = container_obj
+
+    def free_item(self):
+        if self._parent_container:
+            self._parent_container.remove_item(self)
+
+    def parent_container(self):
+        return self._parent_container
 
 
 class Container(Noun):
@@ -36,6 +49,7 @@ class Container(Noun):
         return str(self.contents)
 
     def add_item(self, item: Item) -> None:
+        item.set_parent(self)
         self.contents[item] = f'{item.name.capitalize()} is here.'
 
     def remove_item(self, item: Item) -> None:
@@ -60,27 +74,12 @@ class Room(Container):
 
     def describe_room(self) -> str:
         room_desc = self.name + "\n" + self.texts[Desc.SELF]
-        room_desc += "\n\n"
         for item in self.contents:
-            room_desc += item.texts[Desc.PLACEMENT] + ' '
+            if item.texts.get(Desc.PLACEMENT):
+                room_desc += "\n\n"
+                room_desc += item.texts[Desc.PLACEMENT] + ' '
 
         return room_desc
 
-
-class Player(Noun):
-    _inventory: dict = dict()
-    _player_location: Room = Game.start
-
-    @property
-    def inventory(self) -> dict:
-        return self._inventory
-
-    @staticmethod
-    def store(item_obj: Item):
-        Player._inventory[item_obj.name] = item_obj
-
-    @staticmethod
-    def get_ids():
-        return Player._inventory.values()
 
 

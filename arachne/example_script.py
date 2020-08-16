@@ -1,7 +1,9 @@
 # This is an example script to help debug early iterations of Arachne.
 
+from arachne.game import Game
 from arachne.nouns import Room, Item
 from arachne.lingo import Desc
+from arachne.game_init import GameInit
 
 starting_room = Room("The Beginning")
 red_rose = Item("the red rose")
@@ -18,5 +20,6 @@ starting_room.add_description(
 )
 
 starting_room.add_item(red_rose)
+Game.set_start(starting_room)
 
-print(starting_room.describe_room())
+GameInit.main_game_loop()

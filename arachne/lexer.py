@@ -1,4 +1,3 @@
-# TODO: note to self, remember to convert to lowercase
 from arachne.lingo import Verb
 from arachne.game import Game
 import re
@@ -6,6 +5,7 @@ import re
 
 # This tuple of tuples displays acceptable synonym regexes of each default action verb.
 verb_lexicon = (
+    (Verb.LOOK,      "^look$"),
     (Verb.TAKE,      "^take$|^get$|^pick up$"),
     (Verb.DROP,      "^drop$"),
     (Verb.EXAMINE,   "^x$|^check$|^examine$"),
@@ -60,12 +60,12 @@ def _determine_subject(given_subject: str = None) -> tuple:
     # in the case that a lone verb is inputted
     if subject == "": return True, None
 
+    pats = _derive_patterns(subject)
+    # TODO: In the future, check only in vicinity, not in all IDs.
     for obj in Game.ids():
-        for pattern in _derive_patterns(obj):
-            search = re.search(pattern, subject)
-            if search: results.append(obj)
-
-    print(results)
+        for pattern in pats:
+            if pattern in obj.keywords:
+                results.append(obj)
 
     if len(results) == 0:
         # in the case that no such string can be matched; subject doesn't exist
@@ -74,7 +74,7 @@ def _determine_subject(given_subject: str = None) -> tuple:
     if len(results) > 1:
         # in the case that more than one item that matches given_subject, process all matches
         print("Which one?")
-        for obj in enumerate(results, start = 1):
+        for obj in enumerate(results, start=1):
             # TODO: Pass results to a function to parse options.
             print(f"{obj[0]})", obj[1].name, end=" ")
 
@@ -94,11 +94,18 @@ def _trim_article(given_str: str) -> str:
     return given_str
 
 
-def _derive_patterns(subject) -> list:
-    _split = subject.name.split()
+def _derive_patterns(subject: str) -> list:
+    _split = subject.split()
     _patterns = []
+
+    # split whole name into parseable keyword patterns for regex consumption
     for keyword in _split:
-        key_str = "^" + keyword + "$"
+        key_str = keyword
         _patterns.append(key_str)
 
+    # finally pattern whole name
+    if not subject in _patterns:
+        _patterns.append(subject)
+
+    print(_patterns)
     return _patterns
