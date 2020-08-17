@@ -54,7 +54,6 @@ def _determine_verb(given_verb: str) -> Verb:
 def _determine_subject(given_subject: str = None) -> tuple:
     # TODO: trim articles here, refactor rename given_subject
     subject = _trim_article(given_subject)
-    print(f"{subject} has been trimmed")
     results = []
 
     # in the case that a lone verb is inputted
@@ -73,10 +72,7 @@ def _determine_subject(given_subject: str = None) -> tuple:
 
     if len(results) > 1:
         # in the case that more than one item that matches given_subject, process all matches
-        print("Which one?")
-        for obj in enumerate(results, start=1):
-            # TODO: Pass results to a function to parse options.
-            print(f"{obj[0]})", obj[1].name, end=" ")
+        return _duplicates_resolution(results)
 
     # finally return found object
     return True, results[0]
@@ -94,7 +90,7 @@ def _trim_article(given_str: str) -> str:
     return given_str
 
 
-def _derive_patterns(subject: str) -> list:
+def _derive_patterns(subject: str) -> set:
     _split = subject.split()
     _patterns = []
 
@@ -104,8 +100,25 @@ def _derive_patterns(subject: str) -> list:
         _patterns.append(key_str)
 
     # finally pattern whole name
-    if not subject in _patterns:
-        _patterns.append(subject)
+    _patterns.append(subject)
 
-    print(_patterns)
-    return _patterns
+    return set(_patterns)
+
+
+def _duplicates_resolution(results: list) -> tuple:
+    union = dict()
+
+    print("Which one?")
+
+    for result in enumerate(results, start=1):
+        print(f"{result[0]})", result[1].name, end=" ")
+        for key in result[1].keywords:
+            if key in union:
+                union.pop(key)
+            else:
+                union[key] = result[1]
+
+    choice = input("\n>")
+    if choice in union:
+        return True, union[choice]
+    return False, choice
