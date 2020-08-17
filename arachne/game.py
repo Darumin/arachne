@@ -1,5 +1,5 @@
 # The primary game state hub.
-
+from arachne.nouns import Container
 
 class Game:
     # TODO: When I finally do the main game loop, this should be initialized as beginning room.
@@ -33,11 +33,14 @@ class Game:
 
 
 class Player:
-    _inventory: dict = dict()
     _player_location = Game.start
+    _inventory: Container = Container(
+        name="Player",
+        when_examined="Despite everything, it's still you.",
+    )
 
     @property
-    def inventory(self) -> dict:
+    def inventory(self) -> Container:
         return self._inventory
 
     @staticmethod

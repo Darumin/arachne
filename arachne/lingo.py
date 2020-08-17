@@ -30,10 +30,3 @@ class Verb(Enum):
     REPEAT = ''
 
     NULL = 'invalid input'
-
-
-class Desc(Enum):
-    SELF = "default description; refers to itself"
-    PLACEMENT = "initial description of noun when staged in a setting by author"
-    DROPPED = "description when outside of inventory, has default"
-    STORED = "description of an item in a container"
