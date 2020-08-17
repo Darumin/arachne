@@ -4,6 +4,7 @@
 from arachne.lexer import tokenize
 from arachne.game import Player
 from arachne.lingo import Verb
+from arachne.behaviors import room_description
 
 
 def write_action(input_str: str) -> None:
@@ -23,7 +24,7 @@ class Parser:
     @staticmethod
     def look() -> str:
         surroundings = Player.location()
-        return surroundings.describe_room()
+        return room_description(surroundings)
 
     @staticmethod
     def take(subject_pair: tuple) -> str:

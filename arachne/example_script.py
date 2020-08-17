@@ -1,33 +1,27 @@
 # This is an example script to help debug early iterations of Arachne.
 
-from arachne.game import Game
 from arachne.nouns import Room, Item
-from arachne.lingo import Desc
-from arachne.game_init import GameInit
+from arachne.game import Game
+from arachne.game_init import GameInit as start
 
-starting_room = Room("The Beginning")
-red_rose = Item("the red rose")
-small_red_bag = Item("the small red bag")
-red_bag = Item("the big red bag")
-blue_bag = Item("the big bad blue bag")
-
-red_rose.add_description(
-    Desc.PLACEMENT, "A red rose has been planted in the"
-    " stone planter here.")
-
-# red_balloon.add_description(
-#     Desc.PLACEMENT, "A red balloon floats."
-# )
-
-starting_room.add_description(
-    Desc.SELF, "A cool, low-ceilinged room"
-    " with an LED light fixture casting a ghostly"
-    " blue on the smooth, cemented floor. There is"
-    " a smell of wax."
+blue_room = Room(
+    name="The Blue Room",
+    when_examined="A plain blue room.",
 )
 
-starting_room.add_item(red_rose)
-# starting_room.add_item(red_balloon)
-Game.set_start(starting_room)
+red_rose = Item(
+    name="red rose",
+    when_examined="By any other name, would smell as sweet.",
+    parent_container=blue_room,
+    when_encountered="Placed in a stone coffin."
+)
 
-GameInit.main_game_loop()
+blue_rose = Item(
+    name="blue rose",
+    when_examined="By any other name, it would smell as sweet.",
+    parent_container=blue_room,
+    when_encountered="Placed in a cement hearse."
+)
+
+Game._start_location = blue_room
+start.main_game_loop()
