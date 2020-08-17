@@ -7,7 +7,6 @@ class Noun:
         self.name: str = name
         self.texts: dict = dict()
 
-        self.keywords = self.name.split()
         self.gettable: bool = False
 
         # Build a list of unique object IDs.

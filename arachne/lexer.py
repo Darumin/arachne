@@ -53,18 +53,16 @@ def _determine_verb(given_verb: str) -> Verb:
 
 def _determine_subject(given_subject: str = None) -> tuple:
     # TODO: trim articles here, refactor rename given_subject
-    subject = _trim_article(given_subject)
-    results = []
+    subject: str = _trim_article(given_subject)
+    results: list = list()
 
     # in the case that a lone verb is inputted
     if subject == "": return True, None
 
-    pats = _derive_patterns(subject)
     # TODO: In the future, check only in vicinity, not in all IDs.
     for obj in Game.ids():
-        for pattern in pats:
-            if pattern in obj.keywords:
-                results.append(obj)
+        if subject in obj.name:
+            results.append(obj)
 
     if len(results) == 0:
         # in the case that no such string can be matched; subject doesn't exist
@@ -72,7 +70,7 @@ def _determine_subject(given_subject: str = None) -> tuple:
 
     if len(results) > 1:
         # in the case that more than one item that matches given_subject, process all matches
-        return _duplicates_resolution(results)
+        return _duplicates_resolution(results, subject)
 
     # finally return found object
     return True, results[0]
@@ -90,35 +88,12 @@ def _trim_article(given_str: str) -> str:
     return given_str
 
 
-def _derive_patterns(subject: str) -> set:
-    _split = subject.split()
-    _patterns = []
-
-    # split whole name into parseable keyword patterns for regex consumption
-    for keyword in _split:
-        key_str = keyword
-        _patterns.append(key_str)
-
-    # finally pattern whole name
-    _patterns.append(subject)
-
-    return set(_patterns)
-
-
-def _duplicates_resolution(results: list) -> tuple:
-    union = dict()
+def _duplicates_resolution(results: list, subject: str) -> tuple:
 
     print("Which one?")
 
     for result in enumerate(results, start=1):
         print(f"{result[0]})", result[1].name, end=" ")
-        for key in result[1].keywords:
-            if key in union:
-                union.pop(key)
-            else:
-                union[key] = result[1]
 
     choice = input("\n>")
-    if choice in union:
-        return True, union[choice]
-    return False, choice
+    return _determine_subject(choice)
