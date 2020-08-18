@@ -2,7 +2,6 @@
 # TODO: open containers
 
 from arachne.lexer import tokenize
-from arachne.game import Player
 from arachne.lingo import Verb
 from arachne.behaviors import Behavior as be
 
@@ -23,8 +22,7 @@ def write_action(input_str: str) -> None:
 class Parser:
     @staticmethod
     def look() -> str:
-        surroundings = Player.location()
-        return be.room_description(surroundings)
+        return be.room_description(be.player_location())
 
     @staticmethod
     def take(subject_pair: tuple) -> str:
@@ -35,11 +33,11 @@ class Parser:
             return "Please specify what you want to take."
         if header is False:
             return f"This isn't available -> '{subject}'"
-        if subject in Player.get_ids():
+        if subject in be.inventory():
             return f"{subject.name} is already in your posession."
 
-        Player.store(subject)
-        subject.free_item()
+        be.add_to_inventory(subject)
+        be.free_item(subject)
         return f"You take {subject.name}."
 
     @staticmethod

@@ -2,8 +2,9 @@
 
 from arachne.nouns import Room, Item
 from arachne.behaviors import Behavior as be
-from arachne.game import Game
+from arachne.game import _Game
 from arachne.game_init import GameInit as start
+
 
 blue_room = Room(
     name="The Blue Room",
@@ -24,5 +25,8 @@ blue_rose = Item(
 
 be.add_to_container(blue_room, blue_rose)
 be.add_to_container(blue_room, red_rose)
-Game._start_location = blue_room
+
+
+be.set_start(blue_room)
+print(be.inventory())
 start.main_game_loop()

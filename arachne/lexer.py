@@ -1,5 +1,5 @@
 from arachne.lingo import Verb
-from arachne.game import Game
+from arachne.game import _Game, _Player
 import re
 
 
@@ -60,9 +60,10 @@ def _determine_subject(given_subject: str = None) -> tuple:
     if subject == "": return True, None
 
     # TODO: In the future, check only in vicinity, not in all IDs.
-    for obj in Game.ids():
-        if subject in obj.name:
-            results.append(obj)
+    vicinity = _Player.vicinity()
+    for object_id in vicinity:
+        if subject in vicinity[object_id].name:
+            results.append(object_id)
 
     if len(results) == 0:
         # in the case that no such string can be matched; subject doesn't exist
@@ -73,7 +74,7 @@ def _determine_subject(given_subject: str = None) -> tuple:
         return _duplicates_resolution(results, subject)
 
     # finally return found object
-    return True, results[0]
+    return True, vicinity[results[0]]
 
 
 def _trim_article(given_str: str) -> str:
@@ -93,7 +94,7 @@ def _duplicates_resolution(results: list, subject: str) -> tuple:
     print("Which one?")
 
     for result in enumerate(results, start=1):
-        print(f"{result[0]})", result[1].name, end=" ")
+        print(f"{result[0]})", result[1], end=" ")
 
     choice = input("\n>")
     return _determine_subject(choice)
