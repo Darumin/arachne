@@ -1,11 +1,9 @@
 from enum import Enum
-
-##
-### Arachne's enum vocabulary.
-##
+# constants subclassing enum
 
 
 class Verb(Enum):
+    # basic player actions
     LOOK = "takes in surroundings"
     TAKE = "takes either a single item or all"
     DROP = "move designated item to floor"
@@ -14,11 +12,13 @@ class Verb(Enum):
     INVENTORY = "inspects player's possessions"
     USE = "uses designated item"
 
+    # room limitation actions
     OPEN = ''
     CLOSE = ''
     LOCK = ''
     UNLOCK = ''
 
+    # social and personal actions
     THINK = "can be used as an objective tracker"
     ASK = ''
     TELL = ''
@@ -26,7 +26,9 @@ class Verb(Enum):
     GIVE = ''
     SHOW = ''
 
+    # sequence actions
     WAIT = ''
     REPEAT = ''
 
-    NULL = 'invalid input'
+    # case of bad verb
+    NULL = "invalid input"

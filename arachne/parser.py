@@ -1,16 +1,14 @@
-# TODO: Scan vicinity must check all location's contents + free items and items in
-# TODO: open containers
-
+# TODO: Work on freeing items from their parent containers.
 from arachne.lexer import tokenize
 from arachne.lingo import Verb
 from arachne.behaviors import Behavior as be
+# this is where input is parsed from passed tokens, then resolves into turn event
 
 
+# this function writes the resulting action of given input!
 def write_action(input_str: str) -> None:
-    # TODO: future implementation, 'if' structure should return rather than print()
-    # TODO: This should pipeline to the GUI. Change return type as well.
-
-    lowered = input_str.lower()
+    # verb is type str, subject is type tuple
+    lowered: str = input_str.lower()
     verb, subject = tokenize(lowered)
 
     if verb is Verb.LOOK: print(Parser.look())
@@ -28,21 +26,18 @@ class Parser:
     def take(subject_pair: tuple) -> str:
         header, subject = subject_pair
 
-        if subject is None:
+        # TODO: somehow refactor this into something less ugly
+        if not subject:
             # TODO: far future, please add implicit taking, i.e. "take {last_interacted}"
             return "Please specify what you want to take."
         if header is False:
             return f"This isn't available -> '{subject}'"
         if subject in be.inventory():
-            return f"{subject.name} is already in your posession."
+            return f"{subject.name.capitalize()} is already in your posession."
 
         be.add_to_inventory(subject)
-        be.free_item(subject)
+        # be.free_item(subject)
         return f"You take {subject.name}."
-
-    @staticmethod
-    def scan_vicinity():
-        pass
 
     @staticmethod
     def lecture_player() -> str:

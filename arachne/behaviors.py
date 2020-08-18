@@ -1,6 +1,7 @@
 from typing import Any
 from functools import partial
 from arachne.game import _Player, _Game
+# the bulk of game behavior is found here
 
 
 class Behavior:
@@ -36,7 +37,7 @@ class Behavior:
 
     @staticmethod
     def inventory():
-        return _Player.contents
+        return _Player.contents.values()
 
     @staticmethod
     def free_item(item: Any):
@@ -52,6 +53,11 @@ class Behavior:
     @staticmethod
     def set_player_location(room: Any):
         _Player.current_location = room
+
+    @staticmethod
+    def vicinity() -> dict:
+        _current_location: Any = Behavior.player_location()
+        return _current_location.contents
 
     @staticmethod
     def add_to_container(given: Any, item: Any):
