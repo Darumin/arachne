@@ -6,24 +6,37 @@ from arachne.game import _Player, _Game
 
 class Behavior:
     @staticmethod
-    def set_start(room: Any):
-        _Game._start_location = room
-        Behavior.set_player_location(room)
-
-    @staticmethod
-    def return_attribute(given: Any, attribute: str) -> str:
+    def return_attribute(given, attribute: str) -> str:
+        """
+        :param given: Noun
+        """
         return getattr(given, attribute)
 
     @staticmethod
-    def room_description(given: Any) -> str:
-        desc: str = return_name(given)
-        desc += "\n" + return_examined(given)
-        desc += Behavior.room_placed_description(given)
+    def set_start(room) -> None:
+        """
+        :param room: Room
+        """
+        _Game._start_location = room
+        Behavior.set_player_location(room)
+
+
+    @staticmethod
+    def room_description(room) -> str:
+        """
+        :param room: Room
+        """
+        desc: str = return_name(room)
+        desc += "\n" + return_examined(room)
+        desc += Behavior.room_placed_description(room)
         return desc
 
     @staticmethod
-    def room_placed_description(given: Any) -> str:
-        extra: dict = return_contents(given)
+    def room_placed_description(room) -> str:
+        """
+        :param room: Room
+        """
+        extra: dict = return_contents(room)
         desc: str = ""
         if extra:
             desc += "\n\n"
@@ -32,19 +45,25 @@ class Behavior:
         return desc
 
     @staticmethod
-    def add_to_inventory(item: Any):
-        Behavior.add_to_container(_Player, item)
-
-    @staticmethod
     def inventory():
         return _Player.contents.values()
 
     @staticmethod
-    def free_item(item: Any):
-        _contents = item
-        if _contents:
-            Behavior.remove_from_container(_contents, item)
+    def add_to_inventory(item) -> None:
+        """
+        :param item: Item
+        """
+        Behavior.add_to_container(_Player, item)
+
+    @staticmethod
+    def free_item(item):
+        """
+        :param item: Item
+        """
+        parent = item.parent_container
+        if parent:
             item.parent_container = None
+            Behavior.remove_from_container(parent, item)
 
     @staticmethod
     def player_location():
@@ -60,20 +79,19 @@ class Behavior:
         return _current_location.contents
 
     @staticmethod
-    def add_to_container(given: Any, item: Any):
-        given.contents = Behavior._add_to_container(given, item)
-
-    @staticmethod
-    def _add_to_container(given: Any, item: Any) -> dict:
-        _contents: dict = return_contents(given)
+    def add_to_container(container, item):
+        """
+        :param container: Room or Container
+        :param item: Item
+        """
         _key: int = id(item)
-        if _key not in _contents:
-            _contents[_key] = item
-        return dict(_contents)
+        if _key not in container.contents:
+            container.contents[_key] = item
+            item.parent_container = container
 
     @staticmethod
-    def remove_from_container(given: Any, item: Any):
-        given.contents.pop(id(item))
+    def remove_from_container(container, item):
+        container.contents.pop(id(item))
 
 
 return_name = partial(Behavior.return_attribute, attribute="name")

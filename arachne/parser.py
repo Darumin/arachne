@@ -20,23 +20,25 @@ def write_action(input_str: str) -> None:
 class Parser:
     @staticmethod
     def look() -> str:
+        print(be.player_location().contents)
         return be.room_description(be.player_location())
 
     @staticmethod
     def take(subject_pair: tuple) -> str:
-        header, subject = subject_pair
+        takeable, subject = subject_pair
 
         # TODO: somehow refactor this into something less ugly
-        if not subject:
+        if subject is None:
             # TODO: far future, please add implicit taking, i.e. "take {last_interacted}"
             return "Please specify what you want to take."
-        if header is False:
+        if not takeable:
             return f"This isn't available -> '{subject}'"
         if subject in be.inventory():
             return f"{subject.name.capitalize()} is already in your posession."
 
+        be.free_item(subject)
         be.add_to_inventory(subject)
-        # be.free_item(subject)
+
         return f"You take {subject.name}."
 
     @staticmethod

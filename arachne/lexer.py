@@ -76,12 +76,12 @@ def _split_keywords(given_str: str) -> tuple:
 
 # did you know? that articles are actually adjectives; they describe the nouns they precede.
 def _trim_article(given_subject: str) -> str:
-    articles: str = "a|an|the|some"
+    articles: str = "^a |^an |^the |^some "
     matched = re.match(articles, given_subject)
 
     if matched:
         index: int = matched.end()
-        return _trim_article(given_subject[index + 1:])
+        return _trim_article(given_subject[index:])
     return given_subject
 
 
