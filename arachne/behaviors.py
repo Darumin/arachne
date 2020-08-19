@@ -91,6 +91,10 @@ class Behavior:
 
     @staticmethod
     def remove_from_container(container, item):
+        """
+        :param container: Container
+        :param item: Item
+        """
         container.contents.pop(id(item))
 
 

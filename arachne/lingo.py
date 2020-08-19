@@ -32,3 +32,13 @@ class Verb(Enum):
 
     # case of bad verb
     NULL = "invalid input"
+
+
+class Subject(Enum):
+    ALL = "allllll"
+    UNSPECIFIED = "diffferencee"
+    NONEXISTENT = "asdasdsa"
+    FOUND = "ghghgh"
+    MULTIPLE = "aaa!"
+
+    NULL = "invalid subject"

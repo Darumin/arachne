@@ -1,18 +1,19 @@
 import re
 
-from arachne.lingo import Verb
+from arachne.lingo import Verb, Subject
 from arachne.behaviors import Behavior as be
 # here is where input is tokenized and sent to parser
 
 
 # this tuple of tuples displays acceptable input that matches a universal verb using regex strings
 verb_lexicon = (
-    (Verb.LOOK, "^look$"),
+    (Verb.LOOK, "^look$|^look around$"),
     (Verb.TAKE, "^take$|^get$|^pick up$"),
     (Verb.DROP, "^drop$"),
     (Verb.EXAMINE, "^x$|^check$|^examine$"),
     (Verb.PUT, "^put$|^store$"),
-    (Verb.INVENTORY, "^i$|^inventory$|^inv$")
+    (Verb.INVENTORY, "^i$|^inventory$|^inv$"),
+    (Verb.USE, "^use$|^consume$|^spend$")
 )
 
 
@@ -33,32 +34,35 @@ def _determine_verb(given_verb: str) -> Verb:
     return Verb.NULL
 
 
-def _determine_subject(given_subject: str) -> tuple:
-    # in the case that a lone verb is inputted, prompt unspecified
-    if given_subject == "":
-        unspecified: tuple = (True, None)
-        return unspecified
+def _validate_subject(given_subject: str, results: list) -> Subject:
+    if given_subject == "all": return Subject.ALL
+    if given_subject == "": return Subject.UNSPECIFIED
+    if len(results) == 0: return Subject.NONEXISTENT
+    if len(results) > 1: return Subject.MULTIPLE
+    return Subject.FOUND
 
+
+def _determine_subject(given_subject: str) -> tuple:
     subject: str = _trim_article(given_subject)
     results: list = list()
 
+    # check vicinity for closest matching subject
     vicinity = be.vicinity()
     for object_id in vicinity:
         instance = vicinity[object_id]
         if subject in instance.name:
             results.append(instance)
 
-    # in the case that no such string can be matched; subject is nonexistent or not within reach
-    if len(results) == 0:
-        nonexistent: tuple = (False, subject)
-        return nonexistent
-    # in the case that more than one item that matches given_subject, process all matches
-    if len(results) > 1:
-        return _duplicates_resolution(results)
+    # check what kind of subject input this is
+    validation = _validate_subject(subject, results)
 
-    # finally return found object
-    found: tuple = (True, results[0])
-    return found
+    # if multiple matches, resolve the matches
+    if validation is Subject.MULTIPLE: return _multiples_resolution(results)
+    if validation is Subject.UNSPECIFIED: return validation, ""
+    if validation is Subject.NONEXISTENT: return validation, subject
+
+    subject_pair: tuple = (validation, results[0])
+    return subject_pair
 
 
 # if input is a lone verb, return an empty subject string to raise lone verb flag.
@@ -85,7 +89,7 @@ def _trim_article(given_subject: str) -> str:
     return given_subject
 
 
-def _duplicates_resolution(results: list) -> tuple:
+def _multiples_resolution(results: list) -> tuple:
     print("Which one?")
 
     for result in enumerate(results, start=1):
