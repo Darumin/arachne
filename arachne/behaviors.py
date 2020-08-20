@@ -1,10 +1,13 @@
 from typing import Any
 from functools import partial
+
+from arachne.nouns import Container
 from arachne.game import _Player, _Game
 # the bulk of game behavior is found here
 
 
 class Behavior:
+
     @staticmethod
     def return_attribute(given, attribute: str) -> str:
         """

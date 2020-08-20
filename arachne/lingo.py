@@ -35,6 +35,7 @@ class Verb(Enum):
 
 
 class Subject(Enum):
+    ARTICLES = "not necessaarily a subject"
     ALL = "allllll"
     UNSPECIFIED = "diffferencee"
     NONEXISTENT = "asdasdsa"
@@ -42,3 +43,9 @@ class Subject(Enum):
     MULTIPLE = "aaa!"
 
     NULL = "invalid subject"
+
+
+class Prep(Enum):
+    WITHIN = "put the toy in the box"
+    ATOP = "place the toy on the box"
+    SETTING = "set the dial to ten"

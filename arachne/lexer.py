@@ -1,6 +1,6 @@
 import re
 
-from arachne.lingo import Verb, Subject
+from arachne.lingo import Verb, Subject, Prep
 from arachne.behaviors import Behavior as be
 # here is where input is tokenized and sent to parser
 
@@ -11,9 +11,15 @@ verb_lexicon = (
     (Verb.TAKE, "^take$|^get$|^pick up$"),
     (Verb.DROP, "^drop$"),
     (Verb.EXAMINE, "^x$|^check$|^examine$"),
-    (Verb.PUT, "^put$|^store$"),
+    (Verb.PUT, "^put$|^store$|^place$"),
     (Verb.INVENTORY, "^i$|^inventory$|^inv$"),
     (Verb.USE, "^use$|^consume$|^spend$")
+)
+
+preposition_lexicon = (
+    (Prep.WITHIN, "in |inside |into "),
+    (Prep.ATOP, "on |on top of |above "),
+    (Prep.SETTING, "at |to ")
 )
 
 
@@ -22,6 +28,7 @@ def tokenize(given_str: str):
     a, b = _split_keywords(given_str)
     verb = _determine_verb(a)
     subject = _determine_subject(b)
+
     return verb, subject
 
 
@@ -40,6 +47,14 @@ def _validate_subject(given_subject: str, results: list) -> Subject:
     if len(results) == 0: return Subject.NONEXISTENT
     if len(results) > 1: return Subject.MULTIPLE
     return Subject.FOUND
+
+
+# def _determine_preposition(given_subject: str) -> Prep:
+#     for entry in preposition_lexicon:
+#         found_match = re.search(entry[1], given_subject)
+#         if found_match:
+#             return entry[0]
+#     return Verb
 
 
 def _determine_subject(given_subject: str) -> tuple:
