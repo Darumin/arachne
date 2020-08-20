@@ -4,19 +4,19 @@ from enum import Enum
 
 class Verb(Enum):
     # basic player actions
-    LOOK = "takes in surroundings"
-    TAKE = "takes either a single item or all"
-    DROP = "move designated item to floor"
-    EXAMINE = "returns description of object"
-    PUT = "move designated item to container"
-    INVENTORY = "inspects player's possessions"
-    USE = "uses designated item"
+    LOOK = "i'm rotating it in my mind"
+    TAKE = "the act of picking things up"
+    DROP = "the act of putting things down"
+    PUT = "the act of placing things where you want them"
+    EXAMINE = "when you want to really see something"
+    INVENTORY = "when you really want to see your somethings"
+    USE = "when you want to spend your somethings"
 
     # room limitation actions
-    OPEN = ''
-    CLOSE = ''
-    LOCK = ''
-    UNLOCK = ''
+    OPEN = "open a container or door"
+    CLOSE = "close a container or door"
+    UNLOCK = "unlock a container or door"
+    LOCK = "lock a container or door"
 
     # social and personal actions
     THINK = "can be used as an objective tracker"
@@ -34,18 +34,17 @@ class Verb(Enum):
     NULL = "invalid input"
 
 
-class Subject(Enum):
-    ARTICLES = "not necessaarily a subject"
-    ALL = "allllll"
-    UNSPECIFIED = "diffferencee"
-    NONEXISTENT = "asdasdsa"
-    FOUND = "ghghgh"
-    MULTIPLE = "aaa!"
+class Object(Enum):
+    FOUND = "there's something like that nearby"
+    MULTIPLE = "there's more than one thing like that nearby"
+    NONEXISTENT = "there's nothing like that nearby"
+    UNSPECIFIED = "there's nothing"
+    POSSESSED = "not in a scary sense, but in a carry sense"
 
-    NULL = "invalid subject"
+    ALL = "every loose item nearby"
 
 
 class Prep(Enum):
     WITHIN = "put the toy in the box"
     ATOP = "place the toy on the box"
-    SETTING = "set the dial to ten"
+    SETTING = "turn the dial to ten"

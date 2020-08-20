@@ -1,7 +1,7 @@
 from typing import Any
 from functools import partial
 
-from arachne.nouns import Container
+from arachne.lingo import Verb, Object
 from arachne.game import _Player, _Game
 # the bulk of game behavior is found here
 
@@ -22,7 +22,6 @@ class Behavior:
         """
         _Game._start_location = room
         Behavior.set_player_location(room)
-
 
     @staticmethod
     def room_description(room) -> str:
@@ -49,7 +48,16 @@ class Behavior:
 
     @staticmethod
     def inventory():
-        return _Player.contents.values()
+        return _Player.contents.keys()
+
+    @staticmethod
+    def check_inventory(item_str: str) -> bool:
+        inv = _Player.contents
+        for item_id in inv:
+            instance = inv[item_id]
+            if item_str in instance.name:
+                return True
+        return False
 
     @staticmethod
     def add_to_inventory(item) -> None:
@@ -100,8 +108,54 @@ class Behavior:
         """
         container.contents.pop(id(item))
 
+    @staticmethod
+    def guess_object(object_str: str) -> tuple:
+        """
+        :return: tuple of (Object, list)
+        """
+        results: list = list()
+        if object_str == "": return Object.UNSPECIFIED, results
+        if Behavior.check_inventory(object_str): return Object.POSSESSED, results
+
+        # check vicinity for closest matching subject
+        vicinity: dict = Behavior.vicinity()
+        for object_id in vicinity:
+            instance = vicinity[object_id]
+            if object_str in instance.name:
+                results.append(instance)
+
+        # check what kind of subject input this is
+        typified = Behavior.typify_object(object_str, len(results))
+
+        # if multiple matches, resolve the matches
+        if typified is Object.MULTIPLE: return Behavior.resolve_multiple(results)
+
+        # finally return this tuple if nothing else applies
+        return typified, results
+
+    @staticmethod
+    def typify_object(object_str: str, amount_found: int) -> Object:
+        if object_str == "all": return Object.ALL
+        if amount_found == 0: return Object.NONEXISTENT
+        if amount_found > 1: return Object.MULTIPLE
+        return Object.FOUND
+
+    @staticmethod
+    def resolve_multiple(results: list):
+        print("Which one?")
+
+        for result in enumerate(results, start=1):
+            print(f"{result[0]})", result[1].name, end=" ")
+
+        choice: str = input("\n>")
+        return Behavior.guess_object(choice)
+
 
 return_name = partial(Behavior.return_attribute, attribute="name")
 return_examined = partial(Behavior.return_attribute, attribute="when_examined")
 return_contents = partial(Behavior.return_attribute, attribute="contents")
 return_encountered = partial(Behavior.return_attribute, attribute="when_encountered")
+
+
+class Verbiage:
+    pass

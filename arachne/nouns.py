@@ -25,3 +25,6 @@ class Room(Container):
 class Item(Noun):
     parent_container: Any = None
     gettable: bool = False
+
+    def __repr__(self):
+        return f"<item:'{self.name}'-> {id(self)}>"
