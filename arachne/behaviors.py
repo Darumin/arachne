@@ -1,17 +1,17 @@
 from typing import Any
 from functools import partial
 
-from arachne.lingo import Verb, Object
+from arachne.lingo import Object
 from arachne.game import _Player, _Game
 # the bulk of game behavior is found here
 
 
 class Behavior:
-
     @staticmethod
-    def return_attribute(given, attribute: str) -> str:
+    def return_attribute(given, attribute) -> str:
         """
         :param given: Noun
+        :param attribute: str
         """
         return getattr(given, attribute)
 
@@ -51,8 +51,12 @@ class Behavior:
         return _Player.contents.keys()
 
     @staticmethod
+    def _inventory_dict():
+        return _Player.contents
+
+    @staticmethod
     def check_inventory(item_str: str) -> bool:
-        inv = _Player.contents
+        inv = dict(Behavior._inventory_dict())
         for item_id in inv:
             instance = inv[item_id]
             if item_str in instance.name:
@@ -86,8 +90,9 @@ class Behavior:
 
     @staticmethod
     def vicinity() -> dict:
-        _current_location: Any = Behavior.player_location()
-        return _current_location.contents
+        current_location = Behavior.player_location()
+        inventory = Behavior._inventory_dict()
+        return {**current_location.contents, **inventory}
 
     @staticmethod
     def add_to_container(container, item):
@@ -99,6 +104,15 @@ class Behavior:
         if _key not in container.contents:
             container.contents[_key] = item
             item.parent_container = container
+
+    @staticmethod
+    def drop_in_room(item):
+        """
+        :param item: Item
+        """
+        item.when_encountered = f"{item.name.capitalize()} is here."
+        room_dropped = Behavior.player_location()
+        Behavior.add_to_container(room_dropped, item)
 
     @staticmethod
     def remove_from_container(container, item):
@@ -115,9 +129,8 @@ class Behavior:
         """
         results: list = list()
         if object_str == "": return Object.UNSPECIFIED, results
-        if Behavior.check_inventory(object_str): return Object.POSSESSED, results
 
-        # check vicinity for closest matching subject
+        # check vicinity (everywhere except inventory) for closest matching subject
         vicinity: dict = Behavior.vicinity()
         for object_id in vicinity:
             instance = vicinity[object_id]
@@ -138,6 +151,7 @@ class Behavior:
         if object_str == "all": return Object.ALL
         if amount_found == 0: return Object.NONEXISTENT
         if amount_found > 1: return Object.MULTIPLE
+        if Behavior.check_inventory(object_str): return Object.POSSESSED
         return Object.FOUND
 
     @staticmethod
@@ -155,7 +169,3 @@ return_name = partial(Behavior.return_attribute, attribute="name")
 return_examined = partial(Behavior.return_attribute, attribute="when_examined")
 return_contents = partial(Behavior.return_attribute, attribute="contents")
 return_encountered = partial(Behavior.return_attribute, attribute="when_encountered")
-
-
-class Verbiage:
-    pass

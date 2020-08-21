@@ -1,3 +1,4 @@
+# TODO: consolidate "guess object" behavior
 from arachne.lexer import tokenize
 from arachne.lingo import Verb, Object
 from arachne.behaviors import Behavior as be
@@ -13,7 +14,7 @@ def write_action(input_str: str) -> None:
 
     if verb is Verb.LOOK: return Parser.look()
     if verb is Verb.TAKE: return Parser.take(results)
-    if verb is Verb.DROP: pass
+    if verb is Verb.DROP: return Parser.drop(results)
     if verb is Verb.EXAMINE: pass
     if verb is Verb.PUT: pass
     if verb is Verb.INVENTORY: pass
@@ -38,15 +39,35 @@ class Parser:
                 break
 
         # see if this object is valid
+        # target is type Object, list_found is type list with first element type Item
         target, list_found = be.guess_object(given_obj)
 
-        if target is Object.POSSESSED: print(f"You're already carrying that -> {given_obj}")
-        elif target is Object.UNSPECIFIED: print("Take what?")
-        elif target is Object.NONEXISTENT:print(f"This isn't available -> '{given_obj}'")
+        if target is Object.POSSESSED: print(f"You're carrying that -> {list_found[0].name}")
+        elif target is Object.UNSPECIFIED: print("Please specify what you want to take.")
+        elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
         elif target is Object.FOUND:
             be.free_item(list_found[0])
             be.add_to_inventory(list_found[0])
             print(f"You take {list_found[0].name.lower()}.")
+
+    @staticmethod
+    def drop(results: list):
+        given_obj = ""
+
+        for each in results:
+            if isinstance(each[0], Object):
+                given_obj = each[1]
+                break
+
+        target, list_found = be.guess_object(given_obj)
+
+        if target is Object.UNSPECIFIED: print("Please specify what you want to drop.")
+        elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}")
+        elif target is Object.FOUND: print(f"You are not carrying this -> '{given_obj}")
+        elif target is Object.POSSESSED:
+            be.free_item(list_found[0])
+            be.drop_in_room(list_found[0])
+            print(f"You drop {list_found[0].name.lower()}.")
 
     @staticmethod
     def examine(results: list) -> None:
