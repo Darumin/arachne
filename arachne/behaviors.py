@@ -43,7 +43,8 @@ class Behavior:
         if extra:
             desc += "\n\n"
             for each in extra.values():
-                desc += return_encountered(each) + " "
+                if each.is_concealed is False:
+                    desc += return_encountered(each) + " "
         return desc
 
     @staticmethod
@@ -134,7 +135,7 @@ class Behavior:
         vicinity: dict = Behavior.vicinity()
         for object_id in vicinity:
             instance = vicinity[object_id]
-            if object_str in instance.name:
+            if object_str in instance.name and instance.is_concealed is False:
                 results.append(instance)
 
         # check what kind of subject input this is

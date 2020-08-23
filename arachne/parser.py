@@ -20,6 +20,9 @@ def write_action(input_str: str) -> None:
     if verb is Verb.INVENTORY: pass
     if verb is Verb.USE: pass
 
+    if verb is Verb.UNLOCK: pass
+    if verb is Verb.LOCK: pass
+
     return Parser.lecture_player()
 
 
@@ -71,6 +74,10 @@ class Parser:
 
     @staticmethod
     def examine(results: list) -> None:
+        pass
+
+    @staticmethod
+    def lock_switch():
         pass
 
     @staticmethod
