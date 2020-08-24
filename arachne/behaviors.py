@@ -1,8 +1,9 @@
 from typing import Any
 from functools import partial
 
-from arachne.lingo import Object
+from arachne.lingo import Object, Verb
 from arachne.game import _Player, _Game
+from arachne.nouns import Container
 # the bulk of game behavior is found here
 
 
@@ -48,7 +49,11 @@ class Behavior:
         return desc
 
     @staticmethod
-    def inventory():
+    def _inventory_values():
+        return _Player.contents.values()
+
+    @staticmethod
+    def _inventory_keys():
         return _Player.contents.keys()
 
     @staticmethod
@@ -135,7 +140,8 @@ class Behavior:
         vicinity: dict = Behavior.vicinity()
         for object_id in vicinity:
             instance = vicinity[object_id]
-            if object_str in instance.name and instance.is_concealed is False:
+            if object_str in instance.name \
+                    and not instance.is_concealed:
                 results.append(instance)
 
         # check what kind of subject input this is
@@ -165,8 +171,45 @@ class Behavior:
         choice: str = input("\n>")
         return Behavior.guess_object(choice)
 
+    @staticmethod
+    def is_container(noun):
+        return isinstance(noun, Container)
+
+    @staticmethod
+    def check_for_key(container: Container) -> bool:
+        for each in Behavior._inventory_values():
+            unlock_id = return_unlock_id(each)
+            if unlock_id == id(container):
+                return True
+        return False
+
+    @staticmethod
+    def lock_outputs(verb: Verb, container: Container):
+        if Behavior.is_container(container):
+            key_found = Behavior.check_for_key(container)
+            if key_found:
+                if verb is Verb.UNLOCK:
+                    if not container.is_sealed:
+                        print("This is already unlocked.")
+                        return
+                    else:
+                        container.is_sealed = False
+                        print(f"{container.name.capitalize()} has been unlocked.")
+                elif verb is Verb.LOCK:
+                    if container.is_sealed:
+                        print("This is already locked.")
+                        return
+                    else:
+                        container.is_sealed = True
+                        print(f"{container.name.capitalize()} has been locked.")
+            else:
+                print("Could not find a key.")
+        else:
+            print("That is not something you can do that to.")
+
 
 return_name = partial(Behavior.return_attribute, attribute="name")
 return_examined = partial(Behavior.return_attribute, attribute="when_examined")
 return_contents = partial(Behavior.return_attribute, attribute="contents")
 return_encountered = partial(Behavior.return_attribute, attribute="when_encountered")
+return_unlock_id = partial(Behavior.return_attribute, attribute="unlock_id")

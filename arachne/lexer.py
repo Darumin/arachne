@@ -15,6 +15,9 @@ lexicon = (
     (Verb.INVENTORY, "^i$|^inv$|^inventory$"),
     (Verb.USE, "^use$|^consume$|^spend$"),
 
+    (Verb.UNLOCK, "^unlock$"),
+    (Verb.LOCK, "^lock$"),
+
     (Prep.WITHIN, "^in$|^inside$|^into$"),
     (Prep.ATOP, "^on$|^above$"),
     (Prep.SETTING, "^at$|^to$")
