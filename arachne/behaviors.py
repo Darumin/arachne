@@ -148,10 +148,12 @@ class Behavior:
         typified = Behavior.typify_object(object_str, len(results))
 
         # if multiple matches, resolve the matches
+        # if nonexistent, create a list with one entry for the sake of returning a valid tuple
         if typified is Object.MULTIPLE: return Behavior.resolve_multiple(results)
+        if typified is Object.NONEXISTENT: results.append(Object.NONEXISTENT)
 
         # finally return this tuple if nothing else applies
-        return typified, results
+        return typified, results[0]
 
     @staticmethod
     def typify_object(object_str: str, amount_found: int) -> Object:
@@ -203,7 +205,7 @@ class Behavior:
                         container.is_sealed = True
                         print(f"{container.name.capitalize()} has been locked.")
             else:
-                print("Could not find a key.")
+                print("You can't do that without a key.")
         else:
             print("That is not something you can do that to.")
 

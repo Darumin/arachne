@@ -15,7 +15,7 @@ def write_action(input_str: str) -> None:
     if verb is Verb.LOOK: return Parser.look()
     if verb is Verb.TAKE: return Parser.take(results)
     if verb is Verb.DROP: return Parser.drop(results)
-    if verb is Verb.EXAMINE: pass
+    if verb is Verb.EXAMINE: return Parser.examine(results)
     if verb is Verb.PUT: pass
     if verb is Verb.INVENTORY: pass
     if verb is Verb.USE: pass
@@ -33,69 +33,63 @@ class Parser:
 
     @staticmethod
     def take(results: list) -> None:
-        given_obj = ""
+        # we only want to identify one object and ignore everything else. from that identification
+        # derive a target of type Object, and an obj of type Item.
+        given_obj = Parser._get_obj_str(results)
+        target, obj = be.guess_object(given_obj)
 
-        # we only want to identify one object and ignore everything else
-        for each in results:
-            if isinstance(each[0], Object):
-                given_obj = each[1]
-                break
-
-        # see if this object is valid
-        # target is type Object, list_found is type list with first element type Item
-        target, list_found = be.guess_object(given_obj)
-
-        if target is Object.POSSESSED: print(f"You're carrying that -> '{list_found[0].name}'")
-        elif target is Object.UNSPECIFIED: print("Please specify what you want to take.")
+        if target is Object.POSSESSED: print(f"You're carrying that -> '{obj.name}'")
+        elif target is Object.UNSPECIFIED: print("Please specify what you want to take, i.e. \"take the crown\"")
         elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
         elif target is Object.FOUND:
-            found = list_found[0]
-            if found.is_gettable:
-                be.free_item(list_found[0])
-                be.add_to_inventory(list_found[0])
-                print(f"You take {list_found[0].name.lower()}.")
-            else: print("That can't be taken.")
+            if obj.is_gettable:
+                be.free_item(obj)
+                be.add_to_inventory(obj)
+                print(f"You take {obj.name.lower()}.")
+            else: print(f"That can't be taken. -> {obj.name}")
 
     @staticmethod
     def drop(results: list):
-        given_obj = ""
+        given_obj = Parser._get_obj_str(results)
+        target, obj = be.guess_object(given_obj)
 
-        for each in results:
-            if isinstance(each[0], Object):
-                given_obj = each[1]
-                break
-
-        target, list_found = be.guess_object(given_obj)
-
-        if target is Object.UNSPECIFIED: print("Please specify what you want to drop.")
+        if target is Object.UNSPECIFIED: print("Please specify what you want to drop, i.e. \"drop the mic\"")
         elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
         elif target is Object.FOUND: print(f"You are not carrying this -> '{given_obj}'")
         elif target is Object.POSSESSED:
-            be.free_item(list_found[0])
-            be.drop_in_room(list_found[0])
-            print(f"You drop {list_found[0].name.lower()}.")
+            be.free_item(obj)
+            be.drop_in_room(obj)
+            print(f"You drop {obj.name.lower()}.")
 
     @staticmethod
     def examine(results: list) -> None:
-        pass
+        given_obj = Parser._get_obj_str(results)
+        target, obj = be.guess_object(given_obj)
+
+        if target is Object.UNSPECIFIED: print("Please specify what you want to examine, i.e. \"examine dog\"")
+        elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
+        elif target is Object.FOUND or target is Object.POSSESSED:
+            print(obj.when_examined)
 
     @staticmethod
     def lock_switch(verb: Verb, results: list):
-        given_obj = ""
+        given_obj = Parser._get_obj_str(results)
+        target, obj = be.guess_object(given_obj)
 
-        for each in results:
-            if isinstance(each[0], Object):
-                given_obj = each[1]
-                break
-
-        target, list_found = be.guess_object(given_obj)
-
-        if target is Object.UNSPECIFIED: print("Which lock?")
+        if target is Object.UNSPECIFIED: print("What do you want to do that to?")
         elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
         elif target is Object.FOUND or target is Object.POSSESSED:
-            con = list_found[0]
-            be.lock_outputs(verb, con)
+            be.lock_outputs(verb, obj)
 
     @staticmethod
     def lecture_player() -> None:
         print("That is not a good input.")
+
+    @staticmethod
+    def _get_obj_str(results: list) -> str:
+        given_obj = ""
+
+        for each in results:
+            if isinstance(each[0], Object):
+                given_obj = each[1]
+        return given_obj
