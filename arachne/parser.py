@@ -1,6 +1,6 @@
-# TODO: consolidate "guess object" behavior
+# TODO: finish up PUT behavior
 from arachne.lexer import tokenize
-from arachne.lingo import Verb, Object
+from arachne.lingo import Verb, Object, Prep
 from arachne.behaviors import Behavior as be
 # this is where input is parsed from passed tokens, then resolves into turn event
 
@@ -16,7 +16,7 @@ def write_action(input_str: str) -> None:
     if verb is Verb.TAKE: return Parser.take(results)
     if verb is Verb.DROP: return Parser.drop(results)
     if verb is Verb.EXAMINE: return Parser.examine(results)
-    if verb is Verb.PUT: pass
+    if verb is Verb.PUT: return Parser.put(results)
     if verb is Verb.INVENTORY: pass
     if verb is Verb.USE: pass
 
@@ -82,6 +82,30 @@ class Parser:
             be.lock_outputs(verb, obj)
 
     @staticmethod
+    def put(results: list):
+        obj_list, preposition = Parser._extend_with_prep(results)
+        if not obj_list or not preposition:
+            print("Please specify what you want to do, i.e. \"put coin in box\"")
+            return
+
+        if len(obj_list) == 1:
+            print(f"{obj_list[0][1].capitalize()} {preposition[0][1]} what?")
+            return
+
+        target_one, obj_one = be.guess_object(obj_list[0][1])
+        target_two, obj_two = be.guess_object(obj_list[1][1])
+        print(target_one, " -> ", obj_one)
+        print(target_two, " -> ", obj_two)
+        print(preposition[0])
+
+        if preposition[0][0] is Prep.WITHIN:
+            if obj_one.is_gettable:
+                be.free_item(obj_one)
+                be.add_to_container(obj_one, obj_two)
+            else:
+                print("That can't be stored.")
+
+    @staticmethod
     def lecture_player() -> None:
         print("That is not a good input.")
 
@@ -93,3 +117,15 @@ class Parser:
             if isinstance(each[0], Object):
                 given_obj = each[1]
         return given_obj
+
+    @staticmethod
+    def _extend_with_prep(results: list) -> tuple:
+        extends, prep = list(), list()
+
+        for each in results:
+            if isinstance(each[0], Object):
+                extends.append(each)
+            elif isinstance(each[0], Prep):
+                prep.append(each)
+
+        return extends, prep

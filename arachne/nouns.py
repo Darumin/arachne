@@ -18,6 +18,8 @@ class Noun:
 class Container(Noun):
     contents: dict = field(default_factory=dict)
 
+    def __repr__(self):
+        return f"<container:'{self.name}'-> {id(self)}>"
 
 @dataclass
 class Room(Container):

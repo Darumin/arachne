@@ -48,3 +48,5 @@ class Prep(Enum):
     WITHIN = "put the toy in the box"
     ATOP = "place the toy on the box"
     SETTING = "turn the dial to ten"
+
+    NONE = "no prep specified"
