@@ -1,4 +1,4 @@
-# TODO: finish up PUT behavior
+# TODO: Need to implement OPEN and CLOSE
 from arachne.lexer import tokenize
 from arachne.lingo import Verb, Object, Prep
 from arachne.behaviors import Behavior as be
@@ -17,11 +17,13 @@ def write_action(input_str: str) -> None:
     if verb is Verb.DROP: return Parser.drop(results)
     if verb is Verb.EXAMINE: return Parser.examine(results)
     if verb is Verb.PUT: return Parser.put(results)
-    if verb is Verb.INVENTORY: pass
+    if verb is Verb.INVENTORY: return Parser.inventory()
     if verb is Verb.USE: pass
 
     if verb is Verb.UNLOCK or verb is Verb.LOCK:
         return Parser.lock_switch(verb, results)
+    if verb is Verb.OPEN or verb is Verb.CLOSE:
+        pass
 
     return Parser.lecture_player()
 
@@ -69,7 +71,10 @@ class Parser:
         if target is Object.UNSPECIFIED: print("Please specify what you want to examine, i.e. \"examine dog\"")
         elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
         elif target is Object.FOUND or target is Object.POSSESSED:
-            print(obj.when_examined)
+            description = obj.when_examined
+            if obj.has_contents:
+                description += be.describe_contents(obj)
+            print(description)
 
     @staticmethod
     def lock_switch(verb: Verb, results: list):
@@ -94,16 +99,22 @@ class Parser:
 
         target_one, obj_one = be.guess_object(obj_list[0][1])
         target_two, obj_two = be.guess_object(obj_list[1][1])
-        print(target_one, " -> ", obj_one)
-        print(target_two, " -> ", obj_two)
-        print(preposition[0])
+
+        if obj_one is Object.NONEXISTENT or obj_two is Object.NONEXISTENT:
+            print("There is no such thing.")
+            return
 
         if preposition[0][0] is Prep.WITHIN:
             if obj_one.is_gettable:
                 be.free_item(obj_one)
-                be.add_to_container(obj_one, obj_two)
+                be.add_to_container(obj_two, obj_one)
+                print(f"You put {obj_one.name} in {obj_two.name}.")
             else:
                 print("That can't be stored.")
+
+    @staticmethod
+    def inventory():
+        print(be.describe_inventory())
 
     @staticmethod
     def lecture_player() -> None:

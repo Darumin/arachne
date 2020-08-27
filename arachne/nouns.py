@@ -8,10 +8,13 @@ class Noun:
     name: str
     when_examined: str
     when_encountered: str = ""
-    when_opened: str = ""
     is_gettable: bool = False
     is_concealed: bool = False
     is_sealed: bool = False
+
+    @property
+    def has_contents(self):
+        return True if isinstance(self, Container) else False
 
 
 @dataclass
@@ -20,6 +23,7 @@ class Container(Noun):
 
     def __repr__(self):
         return f"<container:'{self.name}'-> {id(self)}>"
+
 
 @dataclass
 class Room(Container):

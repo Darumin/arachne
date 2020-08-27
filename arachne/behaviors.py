@@ -3,7 +3,7 @@ from functools import partial
 
 from arachne.lingo import Object, Verb
 from arachne.game import _Player, _Game
-from arachne.nouns import Container
+from arachne.nouns import Container, Item
 # the bulk of game behavior is found here
 
 
@@ -61,6 +61,21 @@ class Behavior:
         return _Player.contents
 
     @staticmethod
+    def describe_inventory():
+        carrying = list(Behavior._inventory_values())
+
+        if any(Behavior._inventory_dict()):
+            description = "You are carrying... \n"
+            if len(carrying) > 1:
+                for item in carrying[:-1]:
+                    description += item.name + ", "
+                description += "and " + carrying[-1].name + "."
+            else:
+                description += carrying[0].name + "."
+        else: description = "You are not carrying anything."
+        return description
+
+    @staticmethod
     def check_inventory(item_str: str) -> bool:
         inv = dict(Behavior._inventory_dict())
         for item_id in inv:
@@ -96,9 +111,19 @@ class Behavior:
 
     @staticmethod
     def vicinity() -> dict:
-        current_location = Behavior.player_location()
+        open_containers = Behavior.get_all_open_containers()
         inventory = Behavior._inventory_dict()
-        return {**current_location.contents, **inventory}
+        return {**open_containers, **inventory}
+
+    @staticmethod
+    def get_all_open_containers() -> dict:
+        current_location = Behavior.player_location()
+        all_containers = dict()
+        for each in current_location.contents:
+            noun = current_location.contents[each]
+            if isinstance(noun, Container) and not noun.is_sealed:
+                all_containers.update(noun.contents)
+        return {**current_location.contents, **all_containers}
 
     @staticmethod
     def add_to_container(container, item):
@@ -121,12 +146,30 @@ class Behavior:
         Behavior.add_to_container(room_dropped, item)
 
     @staticmethod
-    def remove_from_container(container, item):
+    def remove_from_container(container: Container, item: Item):
         """
         :param container: Container
         :param item: Item
         """
         container.contents.pop(id(item))
+
+    @staticmethod
+    def describe_contents(container: Container):
+        if container.is_sealed:
+            return "\n\nIt is closed."
+
+        elif container.contents:
+            description = "\n\n"
+            values = iter(container.contents.values())
+
+            if len(container.contents) == 1:
+                description += f"Inside is {next(values).name}."
+            else:
+                for item in values:
+                    description += item.name + ", "
+                description = "\n\nInside it are: " + description[2:-2] + "."
+            return description
+        return ""
 
     @staticmethod
     def guess_object(object_str: str) -> tuple:
@@ -174,10 +217,6 @@ class Behavior:
         return Behavior.guess_object(choice)
 
     @staticmethod
-    def is_container(noun):
-        return isinstance(noun, Container)
-
-    @staticmethod
     def check_for_key(container: Container) -> bool:
         for each in Behavior._inventory_values():
             unlock_id = return_unlock_id(each)
@@ -187,7 +226,7 @@ class Behavior:
 
     @staticmethod
     def lock_outputs(verb: Verb, container: Container):
-        if Behavior.is_container(container):
+        if isinstance(container, Container):
             key_found = Behavior.check_for_key(container)
             if key_found:
                 if verb is Verb.UNLOCK:
