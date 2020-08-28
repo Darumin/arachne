@@ -1,6 +1,6 @@
 # TODO: Need to implement OPEN and CLOSE
 from arachne.lexer import tokenize
-from arachne.lingo import Verb, Object, Prep
+from arachne.lingo import Verb, Object, Prep, Compass
 from arachne.behaviors import Behavior as be
 # this is where input is parsed from passed tokens, then resolves into turn event
 
@@ -12,18 +12,19 @@ def write_action(input_str: str) -> None:
     tokenize(lowered, results)
     verb = results[0][0]
 
+    if isinstance(verb, Compass):
+        print("GO")
+        return
+
     if verb is Verb.LOOK: return Parser.look()
     if verb is Verb.TAKE: return Parser.take(results)
     if verb is Verb.DROP: return Parser.drop(results)
     if verb is Verb.EXAMINE: return Parser.examine(results)
     if verb is Verb.PUT: return Parser.put(results)
     if verb is Verb.INVENTORY: return Parser.inventory()
-    if verb is Verb.USE: pass
 
-    if verb is Verb.UNLOCK or verb is Verb.LOCK:
-        return Parser.lock_switch(verb, results)
-    if verb is Verb.OPEN or verb is Verb.CLOSE:
-        pass
+    if verb is Verb.UNLOCK or verb is Verb.LOCK: return Parser.lock_switch(verb, results)
+    if verb is Verb.OPEN or verb is Verb.CLOSE: pass
 
     return Parser.lecture_player()
 

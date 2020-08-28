@@ -27,8 +27,7 @@ class Container(Noun):
 
 @dataclass
 class Room(Container):
-    # adjacency
-    pass
+    adjacency: dict = field(default_factory=dict)
 
 
 @dataclass

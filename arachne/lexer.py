@@ -1,11 +1,24 @@
 import re
 
-from arachne.lingo import Verb, Object, Prep
+from arachne.lingo import Verb, Object, Prep, Compass
 
 
 # encompasses all known in-game vocabulary, unmatched vocab always default to type Object
 lexicon = (
     ("ARTICLES", "^the$|^a$|^an$|^some$"),
+
+    (Compass.NORTH, "^north$|^n$"),
+    (Compass.EAST, "^east$|^e$"),
+    (Compass.WEST, "^west$|^w$"),
+    (Compass.SOUTH, "^south$|^s$"),
+
+    (Compass.NORTHEAST, "^northeast$|^ne$"),
+    (Compass.NORTHWEST, "^northwest$|^nw$"),
+    (Compass.SOUTHEAST, "^southeast$|^se$"),
+    (Compass.SOUTHWEST, "^southwest$|^sw$"),
+
+    (Compass.UP, "^up$|^u$"),
+    (Compass.DOWN, "^down$|^d$"),
 
     (Verb.LOOK, "^look$"),
     (Verb.TAKE, "^take$|^get$"),

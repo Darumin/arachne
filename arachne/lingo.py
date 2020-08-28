@@ -50,3 +50,18 @@ class Prep(Enum):
     SETTING = "turn the dial to ten"
 
     NONE = "no prep specified"
+
+
+class Compass(Enum):
+    NORTH = "north"
+    EAST = "east"
+    WEST = "west"
+    SOUTH = "south"
+
+    NORTHEAST = "northeast"
+    NORTHWEST = "northwest"
+    SOUTHEAST = "southeast"
+    SOUTHWEST = "southwest"
+
+    UP = "going up"
+    DOWN = "coming down"
