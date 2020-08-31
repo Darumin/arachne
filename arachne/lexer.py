@@ -1,58 +1,23 @@
 import re
 
-from arachne.lingo import Verb, Object, Prep, Compass
-
-
-# encompasses all known in-game vocabulary, unmatched vocab always default to type Object
-lexicon = (
-    ("ARTICLES", "^the$|^a$|^an$|^some$"),
-
-    (Compass.NORTH, "^north$|^n$"),
-    (Compass.EAST, "^east$|^e$"),
-    (Compass.WEST, "^west$|^w$"),
-    (Compass.SOUTH, "^south$|^s$"),
-
-    (Compass.NORTHEAST, "^northeast$|^ne$"),
-    (Compass.NORTHWEST, "^northwest$|^nw$"),
-    (Compass.SOUTHEAST, "^southeast$|^se$"),
-    (Compass.SOUTHWEST, "^southwest$|^sw$"),
-
-    (Compass.UP, "^up$|^u$"),
-    (Compass.DOWN, "^down$|^d$"),
-
-    (Verb.LOOK, "^look$"),
-    (Verb.TAKE, "^take$|^get$"),
-    (Verb.DROP, "^drop$"),
-    (Verb.PUT, "^put$|^store$|^place$"),
-    (Verb.EXAMINE, "^x$|^check$|^examine$"),
-    (Verb.INVENTORY, "^i$|^inv$|^inventory$"),
-    (Verb.USE, "^use$|^consume$|^spend$"),
-
-    (Verb.UNLOCK, "^unlock$"),
-    (Verb.LOCK, "^lock$"),
-
-    (Prep.WITHIN, "^in$|^inside$|^into$"),
-    (Prep.ATOP, "^on$|^above$"),
-    (Prep.SETTING, "^at$|^to$")
-)
+from arachne.lingo import Object, lexicon
 
 
 def tokenize(sentence: str, results: list) -> list:
     # snip first word from the sentence
     keywords: list = sentence.split(' ', 1)
 
-    # input, even nonsensical input, defaults to subject if not otherwise defined
+    # input, even nonsensical input, defaults to an unspecified object if not found/defined
     key = Object.UNSPECIFIED
     word = keywords[0]
 
-    # what kind of word is "word"? get the key if word found.
+    # identify what kind of word we got from the split out of a list of words (verb, preposition, etc)
     for entry in lexicon:
         found = re.match(entry[1], word)
         if found:
             key = entry[0]
 
-    # check if there was a subject in the last recursion.
-    # we want to glue sequential subjects together.
+    # check if there was a object in the last recursion. glue sequential objects together.
     if len(results) >= 1:
         past_key = results[-1][0]
         if key == past_key:
@@ -60,7 +25,6 @@ def tokenize(sentence: str, results: list) -> list:
             results.pop()
             word = past_word + ' ' + word
 
-    # if all else fails, word is a word of type "SUBJECT", so add it to our list as such
     results.append((key, word))
 
     # base case and recurse

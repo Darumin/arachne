@@ -34,6 +34,8 @@ class Verb(Enum):
     NULL = "invalid input"
 
 
+# this is an arachne object, in the english grammar sense.
+# not to be confused with object types.
 class Object(Enum):
     FOUND = "there's something like that nearby"
     MULTIPLE = "there's more than one thing like that nearby"
@@ -65,3 +67,37 @@ class Compass(Enum):
 
     UP = "going up"
     DOWN = "coming down"
+
+
+# encompasses all known in-game vocabulary, unmatched vocab always default to type Object
+lexicon = (
+    ("ARTICLES", "^the$|^a$|^an$|^some$"),
+
+    (Compass.NORTH, "^north$|^n$"),
+    (Compass.EAST, "^east$|^e$"),
+    (Compass.WEST, "^west$|^w$"),
+    (Compass.SOUTH, "^south$|^s$"),
+
+    (Compass.NORTHEAST, "^northeast$|^ne$"),
+    (Compass.NORTHWEST, "^northwest$|^nw$"),
+    (Compass.SOUTHEAST, "^southeast$|^se$"),
+    (Compass.SOUTHWEST, "^southwest$|^sw$"),
+
+    (Compass.UP, "^up$|^u$"),
+    (Compass.DOWN, "^down$|^d$"),
+
+    (Verb.LOOK, "^look$"),
+    (Verb.TAKE, "^take$|^get$"),
+    (Verb.DROP, "^drop$"),
+    (Verb.PUT, "^put$|^store$|^place$"),
+    (Verb.EXAMINE, "^x$|^check$|^examine$"),
+    (Verb.INVENTORY, "^i$|^inv$|^inventory$"),
+    (Verb.USE, "^use$|^consume$|^spend$"),
+
+    (Verb.UNLOCK, "^unlock$"),
+    (Verb.LOCK, "^lock$"),
+
+    (Prep.WITHIN, "^in$|^inside$|^into$"),
+    (Prep.ATOP, "^on$|^above$"),
+    (Prep.SETTING, "^at$|^to$")
+)
