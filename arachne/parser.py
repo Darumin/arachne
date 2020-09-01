@@ -13,9 +13,7 @@ def write_action(input_str: str) -> None:
     tokenize(lowered, results)
     verb = results[0][0]
 
-    if isinstance(verb, Compass):
-        print("GO")
-        return
+    if isinstance(verb, Compass): return go(verb)
 
     if verb is Verb.LOOK: return look()
     if verb is Verb.TAKE: return take(results)
@@ -28,6 +26,10 @@ def write_action(input_str: str) -> None:
     if verb is Verb.OPEN or verb is Verb.CLOSE: pass
 
     return lecture_player()
+
+
+def go(verb: Compass):
+    print(be.handle_go(verb))
 
 
 def look() -> None:

@@ -1,6 +1,6 @@
 from functools import partial
 
-from arachne.lingo import Object, Verb
+from arachne.lingo import Object, Verb, Compass
 from arachne.game import _Player, _Game
 from arachne.nouns import Noun, Container, Item, Room
 
@@ -20,6 +20,39 @@ return_unlock_id = partial(return_attribute, attribute="unlock_id")
 def set_start(room: Room) -> None:
     _Game._start_location = room
     set_player_location(room)
+
+
+def handle_go(direction) -> str:
+    compass_rose: dict = get_player_location().adjacency
+    if direction in compass_rose:
+        set_player_location(compass_rose[direction])
+        return room_description(get_player_location())
+    return "Nothing that way."
+
+
+def bridge_rooms(room_one: Room, direction, room_two: Room):
+    opposite = flip_compass(direction)
+    if opposite:
+        if direction in room_two.adjacency:
+            return
+        room_two.adjacency[direction] = room_one
+        room_one.adjacency[opposite] = room_two
+
+def flip_compass(initial) -> Compass:
+    final = None
+
+    if initial is Compass.NORTH: final = Compass.SOUTH
+    elif initial is Compass.EAST: final = Compass.WEST
+    elif initial is Compass.WEST: final = Compass.EAST
+    elif initial is Compass.SOUTH: final = Compass.NORTH
+    elif initial is Compass.NORTHEAST: final = Compass.SOUTHWEST
+    elif initial is Compass.NORTHWEST: final = Compass.SOUTHEAST
+    elif initial is Compass.SOUTHEAST: final = Compass.NORTHWEST
+    elif initial is Compass.SOUTHWEST: final = Compass.NORTHEAST
+    elif initial is Compass.UP: final = Compass.DOWN
+    elif initial is Compass.DOWN: final = Compass.UP
+
+    return final
 
 
 def room_description(room: Room) -> str:
