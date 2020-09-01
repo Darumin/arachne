@@ -94,6 +94,8 @@ lexicon = (
     (Verb.INVENTORY, "^i$|^inv$|^inventory$"),
     (Verb.USE, "^use$|^consume$|^spend$"),
 
+    (Verb.OPEN, "^open$"),
+    (Verb.CLOSE, "^close$"),
     (Verb.UNLOCK, "^unlock$"),
     (Verb.LOCK, "^lock$"),
 

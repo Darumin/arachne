@@ -1,4 +1,4 @@
-# TODO: Need to implement OPEN and CLOSE
+# TODO: Clean up LOCK/UNLOCK
 import arachne.behaviors as be
 
 from arachne.lexer import tokenize
@@ -15,21 +15,25 @@ def write_action(input_str: str) -> None:
 
     if isinstance(verb, Compass): return go(verb)
 
+    if verb is Verb.INVENTORY: return inventory()
     if verb is Verb.LOOK: return look()
     if verb is Verb.TAKE: return take(results)
     if verb is Verb.DROP: return drop(results)
     if verb is Verb.EXAMINE: return examine(results)
     if verb is Verb.PUT: return put(results)
-    if verb is Verb.INVENTORY: return inventory()
 
     if verb is Verb.UNLOCK or verb is Verb.LOCK: return lock_switch(verb, results)
-    if verb is Verb.OPEN or verb is Verb.CLOSE: pass
+    if verb is Verb.OPEN or verb is Verb.CLOSE: return open_or_close(verb, results)
 
     return lecture_player()
 
 
 def go(verb: Compass):
     print(be.handle_go(verb))
+
+
+def inventory():
+    print(be.describe_inventory())
 
 
 def look() -> None:
@@ -86,7 +90,7 @@ def lock_switch(verb: Verb, results: list):
     if target is Object.UNSPECIFIED: print("What do you want to do that to?")
     elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
     elif target is Object.FOUND or target is Object.POSSESSED:
-        be.lock_outputs(verb, obj)
+        be.lock_switch_output(verb, obj)
 
 
 def put(results: list):
@@ -115,8 +119,16 @@ def put(results: list):
             print("That can't be stored.")
 
 
-def inventory():
-    print(be.describe_inventory())
+def open_or_close(verb: Verb, results: list):
+    given_obj = _get_obj_str(results)
+    target, obj = be.guess_object(given_obj)
+
+    if target is Object.UNSPECIFIED: print("Please specify, i.e. \"open red door\"")
+    if target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
+    if target is Object.FOUND:
+        if obj.is_openable:
+            print(be.open_or_close_output(verb, obj))
+        else: print(f"That isn't something you can do that to -> '{given_obj}'")
 
 
 def lecture_player() -> None:

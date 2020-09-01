@@ -8,9 +8,16 @@ class Noun:
     name: str
     when_examined: str
     when_encountered: str = ""
+    is_locked: bool = False
     is_gettable: bool = False
     is_concealed: bool = False
     is_sealed: bool = False
+
+    @property
+    def is_openable(self):
+        temp = Container(name="",when_examined="")
+        ret = self.__class__ is temp.__class__
+        return ret
 
     @property
     def has_contents(self):
@@ -28,6 +35,9 @@ class Container(Noun):
 @dataclass
 class Room(Container):
     adjacency: dict = field(default_factory=dict)
+
+    def __repr__(self):
+        return f"<room:'{self.name}'-> {id(self)}>"
 
 
 @dataclass

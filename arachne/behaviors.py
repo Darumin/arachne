@@ -38,6 +38,7 @@ def bridge_rooms(room_one: Room, direction, room_two: Room):
         room_two.adjacency[direction] = room_one
         room_one.adjacency[opposite] = room_two
 
+
 def flip_compass(initial) -> Compass:
     final = None
 
@@ -166,7 +167,7 @@ def describe_contents(container: Container):
     if container.is_sealed:
         return "\n\nIt is closed."
 
-    elif container.contents:
+    if container.contents:
         description = "\n\n"
         values = iter(container.contents.values())
 
@@ -177,7 +178,7 @@ def describe_contents(container: Container):
                 description += item.name + ", "
             description = "\n\nInside it are: " + description[2:-2] + "."
         return description
-    return ""
+    return "\n\nThere is nothing inside."
 
 
 def guess_object(object_str: str) -> tuple:
@@ -222,33 +223,54 @@ def _resolve_multiple(results: list):
     return guess_object(choice)
 
 
-def check_for_key(container: Container) -> bool:
+def check_for_key(container: Container):
     for each in _inventory().values():
         unlock_id = return_unlock_id(each)
         if unlock_id == id(container):
-            return True
+            return each.name
     return False
 
 
-def lock_outputs(verb: Verb, container: Container):
+def lock_switch_output(verb: Verb, container: Container):
     if isinstance(container, Container):
         key_found = check_for_key(container)
         if key_found:
             if verb is Verb.UNLOCK:
-                if not container.is_sealed:
+                if not container.is_locked:
                     print("This is already unlocked.")
                     return
                 else:
+                    container.is_locked = False
                     container.is_sealed = False
-                    print(f"{container.name.capitalize()} has been unlocked.")
+                    print(f"You unlock {container.name} with {key_found}.")
             elif verb is Verb.LOCK:
-                if container.is_sealed:
+                if container.is_locked:
                     print("This is already locked.")
                     return
                 else:
-                    container.is_sealed = True
-                    print(f"{container.name.capitalize()} has been locked.")
+                    container.is_locked = True
+                    print(f"You lock {container.name} with {key_found}.")
         else:
             print("You can't do that without a key.")
     else:
         print("That is not something you can do that to.")
+
+
+def open_or_close_output(verb: Verb, openable) -> str:
+    locked = openable.is_locked
+    sealed = openable.is_sealed
+
+    if locked and sealed:
+        return "It is locked."
+
+    if verb is Verb.OPEN:
+        if sealed:
+            openable.is_sealed = False
+            return f"You open {openable.name}."
+        else: return f"{openable.name.capitalize()} is already open."
+
+    if verb is Verb.CLOSE:
+        if not sealed:
+            openable.is_sealed = True
+            return f"You close {openable.name}."
+        else: return f"{openable.name.capitalize()} is already closed."
