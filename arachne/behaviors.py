@@ -2,7 +2,7 @@
 from functools import partial
 
 from arachne.lingo import Object, Verb, Compass
-from arachne.game import _Player, Game
+from arachne.game import Player, Game
 from arachne.nouns import Noun, Container, Item, Room
 
 
@@ -18,9 +18,17 @@ return_encountered = partial(return_attribute, attribute="when_encountered")
 return_unlock_id = partial(return_attribute, attribute="unlock_id")
 
 
-def start_game(starting_room: Room):
-    new_game = Game(starting_room)
-    set_player_location(getattr(new_game, "start"))
+def setup_game(game_info):
+    new_game = Game(
+        game_title=getattr(game_info, "game_title"),
+        byline=getattr(game_info, "byline"),
+        preface=getattr(game_info, "preface"),
+        start=getattr(game_info, "start")
+    )
+
+    set_player_location(new_game.start)
+
+    return new_game
 
 
 def handle_go(direction) -> str:
@@ -76,7 +84,7 @@ def _room_placed_description(room: Room) -> str:
 
 
 def _inventory() -> dict:
-    return _Player.contents
+    return Player.contents
 
 
 def describe_inventory() -> str:
@@ -104,7 +112,7 @@ def check_inventory(item_str: str) -> bool:
 
 
 def add_to_inventory(item: Item) -> None:
-    add_to_container(_Player, item)
+    add_to_container(Player, item)
 
 
 def free_item(item: Item):
@@ -115,11 +123,11 @@ def free_item(item: Item):
 
 
 def get_player_location():
-    return _Player.current_location
+    return Player.current_location
 
 
 def set_player_location(room: Room):
-    _Player.current_location = room
+    Player.current_location = room
 
 
 def vicinity() -> dict:

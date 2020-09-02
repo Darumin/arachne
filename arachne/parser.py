@@ -1,12 +1,10 @@
-# TODO: Clean up LOCK/UNLOCK
 import arachne.behaviors as be
 
 from arachne.lexer import tokenize
 from arachne.lingo import Verb, Object, Prep, Compass
-# this is where input is parsed from passed tokens, then resolves into turn event
 
 
-# this function writes the resulting action of given input!
+# this writes the resulting action of given input!
 def write_action(input_str: str) -> None:
     results = []
     lowered: str = input_str.lower()

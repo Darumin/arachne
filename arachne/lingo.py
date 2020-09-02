@@ -1,5 +1,14 @@
 from enum import Enum
-# constants subclassing enum
+import arachne.nouns as a
+
+
+nouns = (
+    a.Container,
+    a.Item,
+    a.Door,
+    a.Room,
+    a.Key
+)
 
 
 class Verb(Enum):

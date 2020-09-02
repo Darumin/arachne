@@ -62,6 +62,8 @@ class Key(Item):
         return f"<key:'{self.name}'-> {id(self)}>"
 
 
+
+
 @dataclass
 class Door(Noun):
     portal_id: int = 0

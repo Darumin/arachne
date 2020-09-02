@@ -1,13 +1,11 @@
-import gc
+from gc import get_objects
 from collections import Counter
-from arachne.nouns import Container, Item, Door, Room, Key
-
-_noun_index = (Container, Item, Door, Room, Key)
+from arachne.lingo import nouns
 
 
-# returns a list of all active instances of `object_type`
-def print_all_instances():
-    counted_objects = _count_objects()
+# returns a list of all active instances
+def print_all_instances() -> None:
+    counted_objects: Counter = _count_objects()
 
     print("ALL ACTIVE")
     for obj in counted_objects:
@@ -15,10 +13,10 @@ def print_all_instances():
 
 
 def _count_objects() -> Counter:
-    obj_list = [
+    obj_list: list = [
         # get all active instances of noun objects
         str(type(o).__name__)
-        for o in gc.get_objects()
+        for o in get_objects()
         if _valid_noun(o)
     ]
 
@@ -30,7 +28,7 @@ def _count_objects() -> Counter:
 
 
 def _valid_noun(obj) -> bool:
-    for noun in _noun_index:
+    for noun in nouns:
         if isinstance(obj, noun):
             return True
     return False
