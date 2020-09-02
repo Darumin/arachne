@@ -1,7 +1,8 @@
+# TODO: fix bridge rooms
 from functools import partial
 
 from arachne.lingo import Object, Verb, Compass
-from arachne.game import _Player
+from arachne.game import _Player, Game
 from arachne.nouns import Noun, Container, Item, Room
 
 
@@ -15,6 +16,11 @@ return_examined = partial(return_attribute, attribute="when_examined")
 return_contents = partial(return_attribute, attribute="contents")
 return_encountered = partial(return_attribute, attribute="when_encountered")
 return_unlock_id = partial(return_attribute, attribute="unlock_id")
+
+
+def start_game(starting_room: Room):
+    new_game = Game(starting_room)
+    set_player_location(getattr(new_game, "start"))
 
 
 def handle_go(direction) -> str:

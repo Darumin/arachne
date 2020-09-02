@@ -2,20 +2,17 @@ from typing import Any
 # the primary game state hub
 
 
-class Game:
-    class _Game:
-        def __init__(self, start):
-            self.start_location = start
-    instance = None
+class Game(object):
+    __instance = None
 
-    def __init__(self, arg):
-        if not Game.instance:
-            Game.instance = Game._Game(arg)
-        else:
-            Game.instance.start_location = arg
+    def __new__(cls, start):
+        if Game.__instance is None:
+            Game.__instance = object.__new__(cls)
+        Game.__instance.start = start
+        return Game.__instance
 
-    def __getattr__(self, name):
-        return getattr(self.instance, name)
+    def __repr__(self):
+        return f"<GAME: {id(self)}, START: '{self.start}'>"
 
 
 class _Player:

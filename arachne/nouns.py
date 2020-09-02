@@ -3,6 +3,7 @@ from typing import Any
 # all the nouns in Arachne are found here
 
 
+
 @dataclass
 class Noun:
     name: str
@@ -63,5 +64,7 @@ class Key(Item):
 
 @dataclass
 class Door(Noun):
+    portal_id: int = 0
+
     def __repr__(self):
         return f"<door:'{self.name}'-> {id(self)}>"
