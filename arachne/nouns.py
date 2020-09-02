@@ -6,22 +6,27 @@ from typing import Any
 @dataclass
 class Noun:
     name: str
-    when_examined: str
+    when_examined: str = ""
     when_encountered: str = ""
     is_locked: bool = False
-    is_gettable: bool = False
     is_concealed: bool = False
     is_sealed: bool = False
 
     @property
     def is_openable(self):
-        temp = Container(name="",when_examined="")
-        ret = self.__class__ is temp.__class__
-        return ret
+        temp = (Container(name=""), Door(name=""))
+        _temp = [i.__class__ for i in temp]
+        return self.__class__ is temp.__class__
+
+    @property
+    def is_gettable(self):
+        temp = (Item(name=""), Key(name=""))
+        _temp = [i.__class__ for i in temp]
+        return self.__class__ in _temp
 
     @property
     def has_contents(self):
-        return True if isinstance(self, Container) else False
+        return isinstance(self, Container)
 
 
 @dataclass
@@ -52,3 +57,11 @@ class Item(Noun):
 class Key(Item):
     unlock_id: int = 0
 
+    def __repr__(self):
+        return f"<key:'{self.name}'-> {id(self)}>"
+
+
+@dataclass
+class Door(Noun):
+    def __repr__(self):
+        return f"<door:'{self.name}'-> {id(self)}>"

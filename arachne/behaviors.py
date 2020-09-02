@@ -1,7 +1,7 @@
 from functools import partial
 
 from arachne.lingo import Object, Verb, Compass
-from arachne.game import _Player, _Game
+from arachne.game import _Player
 from arachne.nouns import Noun, Container, Item, Room
 
 
@@ -15,11 +15,6 @@ return_examined = partial(return_attribute, attribute="when_examined")
 return_contents = partial(return_attribute, attribute="contents")
 return_encountered = partial(return_attribute, attribute="when_encountered")
 return_unlock_id = partial(return_attribute, attribute="unlock_id")
-
-
-def set_start(room: Room) -> None:
-    _Game._start_location = room
-    set_player_location(room)
 
 
 def handle_go(direction) -> str:
@@ -123,12 +118,12 @@ def set_player_location(room: Room):
 
 def vicinity() -> dict:
     # lump everything within reach of player into one dict
-    open_containers = get_all_open_containers()
+    open_containers = _get_all_open_containers()
     inventory = _inventory()
     return {**open_containers, **inventory}
 
 
-def get_all_open_containers() -> dict:
+def _get_all_open_containers() -> dict:
     current_location = get_player_location()
     all_containers = dict()
 
@@ -140,17 +135,17 @@ def get_all_open_containers() -> dict:
     return {**current_location.contents, **all_containers}
 
 
-def add_to_container(subject, item):
+def add_to_container(storage, item):
     """
-    :param subject: can be type _Player, Container, Room
+    :param storage: can be type _Player, Container, Room
     :param item: can be any type where gettable = True
     any subject may have contents containing items. The _Player's contents is inventory.
     see usage of subject in remove_from_container() as well
     """
     _key: int = id(item)
-    if _key not in subject.contents:
-        subject.contents[_key] = item
-        item.parent_container = subject
+    if _key not in storage.contents:
+        storage.contents[_key] = item
+        item.parent_container = storage
 
 
 def drop_in_room(item: Item):
@@ -159,8 +154,8 @@ def drop_in_room(item: Item):
     add_to_container(room_dropped, item)
 
 
-def remove_from_container(subject, item: Item):
-    subject.contents.pop(id(item))
+def remove_from_container(storage, item: Item):
+    storage.contents.pop(id(item))
 
 
 def describe_contents(container: Container):
@@ -177,6 +172,7 @@ def describe_contents(container: Container):
             for item in values:
                 description += item.name + ", "
             description = "\n\nInside it are: " + description[2:-2] + "."
+
         return description
     return "\n\nThere is nothing inside."
 
@@ -189,12 +185,11 @@ def guess_object(object_str: str) -> tuple:
     vic: dict = vicinity()
     for object_id in vic:
         instance = vic[object_id]
-        if object_str in instance.name \
-                and not instance.is_concealed:
+        if object_str in instance.name and not instance.is_concealed:
             results.append(instance)
 
     # check what kind of subject input this is
-    typified = typify_object(object_str, len(results))
+    typified = _typify_object(object_str, len(results))
 
     # if multiple matches, resolve the matches
     # if nonexistent, create a list with one entry for the sake of returning a valid tuple
@@ -205,7 +200,7 @@ def guess_object(object_str: str) -> tuple:
     return typified, results[0]
 
 
-def typify_object(object_str: str, amount_found: int) -> Object:
+def _typify_object(object_str: str, amount_found: int) -> Object:
     if object_str == "all": return Object.ALL
     if amount_found == 0: return Object.NONEXISTENT
     if amount_found > 1: return Object.MULTIPLE
@@ -223,7 +218,7 @@ def _resolve_multiple(results: list):
     return guess_object(choice)
 
 
-def check_for_key(container: Container):
+def check_key_for(container: Container):
     for each in _inventory().values():
         unlock_id = return_unlock_id(each)
         if unlock_id == id(container):
@@ -231,29 +226,29 @@ def check_for_key(container: Container):
     return False
 
 
-def lock_switch_output(verb: Verb, container: Container):
-    if isinstance(container, Container):
-        key_found = check_for_key(container)
-        if key_found:
-            if verb is Verb.UNLOCK:
-                if not container.is_locked:
-                    print("This is already unlocked.")
-                    return
-                else:
-                    container.is_locked = False
-                    container.is_sealed = False
-                    print(f"You unlock {container.name} with {key_found}.")
-            elif verb is Verb.LOCK:
-                if container.is_locked:
-                    print("This is already locked.")
-                    return
-                else:
-                    container.is_locked = True
-                    print(f"You lock {container.name} with {key_found}.")
-        else:
-            print("You can't do that without a key.")
-    else:
+def lock_switch_output(verb: Verb, openable):
+    if not openable.is_openable:
         print("That is not something you can do that to.")
+        return
+
+    key_found = check_key_for(openable)
+
+    if key_found:
+        if verb is Verb.UNLOCK:
+            if not openable.is_locked:
+                print("This is already unlocked.")
+            else:
+                openable.is_locked, openable.is_sealed = False, False
+                print(f"You unlock {openable.name} with {key_found}.")
+
+        if verb is Verb.LOCK:
+            if openable.is_locked:
+                print("This is already locked.")
+            else:
+                openable.is_locked, openable.is_sealed = True, True
+                print(f"You lock {openable.name} with {key_found}.")
+    else:
+        print("You can't do that without the right key.")
 
 
 def open_or_close_output(verb: Verb, openable) -> str:
