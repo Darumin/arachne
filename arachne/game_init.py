@@ -28,7 +28,4 @@ def main_game_loop(game):
     while True:
         command = input(">")
         if command == "quit": break
-        if command == "$check":
-            print(game.game_title)
-            continue
         write_action(command)

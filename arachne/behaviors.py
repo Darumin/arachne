@@ -112,7 +112,7 @@ def check_inventory(item_str: str) -> bool:
 
 
 def add_to_inventory(item: Item) -> None:
-    add_to_container(Player, item)
+    _add_to_container(Player, item)
 
 
 def free_item(item: Item):
@@ -149,13 +149,19 @@ def _get_all_open_containers() -> dict:
     return {**current_location.contents, **all_containers}
 
 
-def add_to_container(storage, item):
+def add_to_container(storage, *items):
+    for item in items:
+        _add_to_container(storage, item)
+
+
+def _add_to_container(storage, item):
     """
     :param storage: can be type _Player, Container, Room
     :param item: can be any type where gettable = True
     any subject may have contents containing items. The _Player's contents is inventory.
     see usage of subject in remove_from_container() as well
     """
+
     _key: int = id(item)
     if _key not in storage.contents:
         storage.contents[_key] = item
@@ -165,7 +171,7 @@ def add_to_container(storage, item):
 def drop_in_room(item: Item):
     item.when_encountered = f"{item.name.capitalize()} is here."
     room_dropped = get_player_location()
-    add_to_container(room_dropped, item)
+    _add_to_container(room_dropped, item)
 
 
 def remove_from_container(storage, item: Item):

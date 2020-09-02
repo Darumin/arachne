@@ -111,7 +111,7 @@ def put(results: list):
     if preposition[0][0] is Prep.WITHIN:
         if obj_one.is_gettable:
             be.free_item(obj_one)
-            be.add_to_container(obj_two, obj_one)
+            be._add_to_container(obj_two, obj_one)
             print(f"You put {obj_one.name} in {obj_two.name}.")
         else:
             print("That can't be stored.")
