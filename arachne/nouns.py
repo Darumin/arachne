@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
 from typing import Any
-# all the nouns in Arachne are found here
-
 
 
 @dataclass
@@ -13,60 +11,48 @@ class Noun:
     is_concealed: bool = False
     is_sealed: bool = False
 
+    def __str__(self):
+        return '<%s -> %i>' % (self.__class__.__name__, id(self))
+
     @property
     def is_openable(self):
-        temp = (Container(name=""), Door(name=""))
-        _temp = [i.__class__ for i in temp]
-        return self.__class__ is temp.__class__
+        temp = self.__class__.__name__
+        return temp is "Container" or temp is "Door"
 
     @property
     def is_gettable(self):
-        temp = (Item(name=""), Key(name=""))
-        _temp = [i.__class__ for i in temp]
-        return self.__class__ in _temp
+        temp = self.__class__.__name__
+        return temp is "Item" or temp is "Key"
 
-    @property
-    def has_contents(self):
-        return isinstance(self, Container)
+
+@dataclass
+class GameInfo:
+    game_title: str
+    byline: str
+    preface: str
+    start: Any
 
 
 @dataclass
 class Container(Noun):
     contents: dict = field(default_factory=dict)
 
-    def __repr__(self):
-        return f"<container:'{self.name}'-> {id(self)}>"
-
 
 @dataclass
 class Room(Container):
     adjacency: dict = field(default_factory=dict)
-
-    def __repr__(self):
-        return f"<room:'{self.name}'-> {id(self)}>"
 
 
 @dataclass
 class Item(Noun):
     parent_container: Any = None
 
-    def __repr__(self):
-        return f"<item:'{self.name}'-> {id(self)}>"
-
 
 @dataclass
 class Key(Item):
     unlock_id: int = 0
 
-    def __repr__(self):
-        return f"<key:'{self.name}'-> {id(self)}>"
-
-
-
 
 @dataclass
 class Door(Noun):
     portal_id: int = 0
-
-    def __repr__(self):
-        return f"<door:'{self.name}'-> {id(self)}>"

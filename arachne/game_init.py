@@ -1,17 +1,6 @@
 from arachne.parser import write_action
 from arachne.behaviors import setup_game
-
-from dataclasses import dataclass
-from arachne.nouns import Room
-
-
-# just a form you fill out
-@dataclass
-class GameInfo:
-    game_title: str
-    byline: str
-    preface: str
-    start: Room
+from arachne.nouns import GameInfo
 
 
 def start(game_info: GameInfo):

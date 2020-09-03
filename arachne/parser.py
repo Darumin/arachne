@@ -75,8 +75,8 @@ def examine(results: list) -> None:
     if target is Object.UNSPECIFIED: print("Please specify what you want to examine, i.e. \"examine dog\"")
     elif target is Object.NONEXISTENT: print(f"This isn't available -> '{given_obj}'")
     elif target is Object.FOUND or target is Object.POSSESSED:
-        description = obj.when_examined
-        if obj.has_contents:
+        description: str = obj.when_examined
+        if obj.__class__.__name__ == "Container":
             description += be.describe_contents(obj)
         print(description)
 
