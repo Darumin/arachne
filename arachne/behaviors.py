@@ -1,9 +1,9 @@
 # TODO: fix bridge rooms
 from functools import partial
 
+from arachne.nouns import Noun, Container, Item, Room
 from arachne.lingo import Object, Verb, Compass
 from arachne.game import Player, Game
-from arachne.nouns import Noun, Container, Item, Room
 
 
 # the bulk of game behavior is found here
@@ -15,7 +15,7 @@ return_name = partial(return_attribute, attribute="name")
 return_examined = partial(return_attribute, attribute="when_examined")
 return_contents = partial(return_attribute, attribute="contents")
 return_encountered = partial(return_attribute, attribute="when_encountered")
-return_unlock_id = partial(return_attribute, attribute="unlock_id")
+return_key_to = partial(return_attribute, attribute="key_to")
 
 
 def setup_game(game_info):
@@ -33,9 +33,14 @@ def setup_game(game_info):
 
 def handle_go(direction) -> str:
     compass_rose: dict = get_player_location().adjacency
+
+    # check for a direction, and if there's a door in the way.
     if direction in compass_rose:
-        set_player_location(compass_rose[direction])
-        return room_description(get_player_location())
+        portal = compass_rose[direction]
+        if portal.is_openable:
+            return "DOOR!"
+        set_player_location(portal)
+        return describe_room(get_player_location())
     return "Nothing that way."
 
 
@@ -46,6 +51,14 @@ def bridge_rooms(room_one: Room, direction, room_two: Room):
             return
         room_two.adjacency[direction] = room_one
         room_one.adjacency[opposite] = room_two
+
+
+def add_door_to(room, door):
+    direction: Compass = door.facing
+
+    if direction in room.adjacency: return
+    room.adjacency[direction] = door
+    add_item_to(room, door)
 
 
 def flip_compass(initial) -> Compass:
@@ -65,11 +78,11 @@ def flip_compass(initial) -> Compass:
     return final
 
 
-def room_description(room: Room) -> str:
+def describe_room(room: Room) -> str:
     desc: str = return_name(room)
     desc += "\n" + return_examined(room)
     desc += _room_placed_description(room)
-    return desc
+    return desc.rstrip()
 
 
 def _room_placed_description(room: Room) -> str:
@@ -112,14 +125,14 @@ def check_inventory(item_str: str) -> bool:
 
 
 def add_to_inventory(item: Item) -> None:
-    _add_to_container(Player, item)
+    _add_item_to(Player, item)
 
 
 def free_item(item: Item):
     parent = item.parent_container
     if parent:
         item.parent_container = None
-        remove_from_container(parent, item)
+        remove_item_from(parent, item)
 
 
 def get_player_location():
@@ -149,12 +162,12 @@ def _get_all_open_containers() -> dict:
     return {**current_location.contents, **all_containers}
 
 
-def add_to_container(storage, *items):
+def add_item_to(storage, *items):
     for item in items:
-        _add_to_container(storage, item)
+        _add_item_to(storage, item)
 
 
-def _add_to_container(storage, item):
+def _add_item_to(storage, item):
     """
     :param storage: can be type _Player, Container, Room
     :param item: can be any type where gettable = True
@@ -168,13 +181,13 @@ def _add_to_container(storage, item):
         item.parent_container = storage
 
 
-def drop_in_room(item: Item):
+def drop_on_floor(item: Item):
     item.when_encountered = f"{item.name.capitalize()} is here."
     room_dropped = get_player_location()
-    _add_to_container(room_dropped, item)
+    _add_item_to(room_dropped, item)
 
 
-def remove_from_container(storage, item: Item):
+def remove_item_from(storage, item: Item):
     storage.contents.pop(id(item))
 
 
@@ -205,7 +218,7 @@ def guess_object(object_str: str) -> tuple:
     vic: dict = vicinity()
     for object_id in vic:
         instance = vic[object_id]
-        if object_str in instance.name and not instance.is_concealed:
+        if object_str in instance.name.lower() and not instance.is_concealed:
             results.append(instance)
 
     # check what kind of subject input this is
@@ -238,10 +251,10 @@ def _resolve_multiple(results: list):
     return guess_object(choice)
 
 
-def check_key_for(container: Container):
+def check_key_for(openable: Container):
     for each in _inventory().values():
-        unlock_id = return_unlock_id(each)
-        if unlock_id == id(container):
+        unlock_id = id(return_key_to(each))
+        if unlock_id == id(openable):
             return each.name
     return False
 

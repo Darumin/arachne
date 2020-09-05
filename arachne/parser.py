@@ -35,7 +35,7 @@ def inventory():
 
 
 def look() -> None:
-    print(be.room_description(be.get_player_location()))
+    print(be.describe_room(be.get_player_location()))
 
 
 def take(results: list) -> None:
@@ -64,7 +64,7 @@ def drop(results: list):
     elif target is Object.FOUND: print(f"You are not carrying this -> '{given_obj}'")
     elif target is Object.POSSESSED:
         be.free_item(obj)
-        be.drop_in_room(obj)
+        be.drop_on_floor(obj)
         print(f"You drop {obj.name.lower()}.")
 
 
@@ -111,7 +111,7 @@ def put(results: list):
     if preposition[0][0] is Prep.WITHIN:
         if obj_one.is_gettable:
             be.free_item(obj_one)
-            be._add_to_container(obj_two, obj_one)
+            be._add_item_to(obj_two, obj_one)
             print(f"You put {obj_one.name} in {obj_two.name}.")
         else:
             print("That can't be stored.")

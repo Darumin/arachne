@@ -50,9 +50,10 @@ class Item(Noun):
 
 @dataclass
 class Key(Item):
-    unlock_id: int = 0
+    key_to: Any = None
 
 
 @dataclass
 class Door(Noun):
-    portal_id: int = 0
+    facing: Any = None
+    goes_to: Any = None
