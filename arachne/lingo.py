@@ -7,7 +7,8 @@ nouns = (
     a.Item,
     a.Door,
     a.Room,
-    a.Key
+    a.Key,
+    a.Door
 )
 
 

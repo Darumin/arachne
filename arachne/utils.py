@@ -3,32 +3,16 @@ from collections import Counter
 from arachne.lingo import nouns
 
 
-# returns a list of all active instances
-def print_all_instances() -> None:
-    counted_objects: Counter = _count_objects()
-
-    print("ALL ACTIVE")
-    for obj in counted_objects:
-        print(f"{obj}s: {counted_objects[obj]}")
-
-
-def _count_objects() -> Counter:
+# returns a count of all active instances
+def count_all_instances() -> Counter:
     obj_list: list = [
-        # get all active instances of noun objects
         str(type(o).__name__)
         for o in get_objects()
-        if _valid_noun(o)
+        if o.__class__ in nouns
     ]
 
-    _count = Counter()
+    counted_instances: Counter = Counter()
     for obj in obj_list:
-        _count[obj] += 1
+        counted_instances[obj] += 1
 
-    return _count
-
-
-def _valid_noun(obj) -> bool:
-    for noun in nouns:
-        if isinstance(obj, noun):
-            return True
-    return False
+    return counted_instances
