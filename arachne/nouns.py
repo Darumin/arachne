@@ -56,3 +56,7 @@ class Key(Item):
 @dataclass
 class Door(Noun):
     room_context: dict = field(default_factory=dict)
+
+    @property
+    def is_maxed(self):
+        return False if len(self.room_context) < 2 else True

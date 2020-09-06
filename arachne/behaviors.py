@@ -44,7 +44,7 @@ def handle_go(direction) -> str:
         else:
             destination = compass_rose[direction]
         set_player_location(destination)
-        return describe_room(current_room)
+        return describe_room(destination)
     return "Nothing that way."
 
 
@@ -65,6 +65,10 @@ def add_path_to(from_place, to_place, direction: Compass):
 
 
 def add_door_to(from_place, to_place, direction: Compass, door: Door):
+    if door.is_maxed:
+        print(max_routes_error(from_place, to_place, door))
+        return
+
     add_path_to(from_place, to_place, direction)
     door.room_context[id(from_place)] = (to_place, direction)
     add_item_to(from_place, door)
@@ -75,6 +79,10 @@ def get_door():
     for each in current_location.contents:
         if current_location.contents[each].__class__ is Door:
             return current_location.contents[each]
+
+
+def max_routes_error(_f, _t, _d):
+    return f"Cannot draw path: `{_f.name} -> {_t.name}` \n`{_d.name}` is maxed!"
 
 
 def flip_compass(initial) -> Compass:
