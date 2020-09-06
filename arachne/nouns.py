@@ -5,8 +5,8 @@ from typing import Any
 @dataclass
 class Noun:
     name: str
-    when_examined: str = ""
-    when_encountered: str = ""
+    when_examined: str = ''
+    when_encountered: str = ''
     is_locked: bool = False
     is_concealed: bool = False
     is_sealed: bool = False
@@ -17,12 +17,12 @@ class Noun:
     @property
     def is_openable(self):
         temp = self.__class__.__name__
-        return temp is "Container" or temp is "Door"
+        return temp is 'Container' or temp is 'Door'
 
     @property
     def is_gettable(self):
         temp = self.__class__.__name__
-        return temp is "Item" or temp is "Key"
+        return temp is 'Item' or temp is 'Key'
 
 
 @dataclass
