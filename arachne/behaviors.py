@@ -1,7 +1,7 @@
-# TODO: fix bridge rooms
+# TODO: resolve open/close lock/unlock with room_context at **
 from functools import partial
 
-from arachne.nouns import Noun, Container, Item, Room
+from arachne.nouns import Noun, Container, Item, Room, Door
 from arachne.lingo import Object, Verb, Compass
 from arachne.game import Player, Game
 
@@ -32,33 +32,49 @@ def setup_game(game_info):
 
 
 def handle_go(direction) -> str:
+    current_room = get_player_location()
     compass_rose: dict = get_player_location().adjacency
 
     # check for a direction, and if there's a door in the way.
     if direction in compass_rose:
-        portal = compass_rose[direction]
-        if portal.is_openable:
-            return "DOOR!"
-        set_player_location(portal)
-        return describe_room(get_player_location())
+        door = get_door()
+        if door:
+            # TODO: ** here
+            destination = door.room_context[id(current_room)][0]
+        else:
+            destination = compass_rose[direction]
+        set_player_location(destination)
+        return describe_room(current_room)
     return "Nothing that way."
 
 
-def bridge_rooms(room_one: Room, direction, room_two: Room):
-    opposite = flip_compass(direction)
-    if opposite:
-        if direction in room_two.adjacency:
-            return
-        room_two.adjacency[direction] = room_one
-        room_one.adjacency[opposite] = room_two
+def bridge_paths(from_place, to_place, direction: Compass):
+    flipped = flip_compass(direction)
+    add_path_to(from_place, to_place, direction)
+    add_path_to(to_place, from_place, flipped)
 
 
-def add_door_to(room, door):
-    direction: Compass = door.facing
+def bridge_doors(from_place, to_place, direction: Compass, door: Door):
+    flipped = flip_compass(direction)
+    add_door_to(from_place, to_place, direction, door)
+    add_door_to(to_place, from_place, flipped, door)
 
-    if direction in room.adjacency: return
-    room.adjacency[direction] = door
-    add_item_to(room, door)
+
+def add_path_to(from_place, to_place, direction: Compass):
+    from_place.adjacency[direction] = to_place
+
+
+def add_door_to(from_place, to_place, direction: Compass, door: Door):
+    add_path_to(from_place, to_place, direction)
+    door.room_context[id(from_place)] = (to_place, direction)
+    add_item_to(from_place, door)
+
+
+def get_door():
+    current_location = get_player_location()
+    for each in current_location.contents:
+        if current_location.contents[each].__class__ is Door:
+            return current_location.contents[each]
 
 
 def flip_compass(initial) -> Compass:

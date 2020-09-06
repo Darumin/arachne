@@ -55,5 +55,4 @@ class Key(Item):
 
 @dataclass
 class Door(Noun):
-    facing: Any = None
-    goes_to: Any = None
+    room_context: dict = field(default_factory=dict)
