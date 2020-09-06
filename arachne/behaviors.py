@@ -1,21 +1,7 @@
 # TODO: resolve open/close lock/unlock with room_context at **
-from functools import partial
-
-from arachne.nouns import Noun, Container, Item, Room, Door
+from arachne.nouns import Container, Item, Room, Door
 from arachne.lingo import Object, Verb, Compass
 from arachne.game import Player, Game
-
-
-# the bulk of game behavior is found here
-def return_attribute(given: Noun, attribute: str) -> str:
-    return getattr(given, attribute)
-
-
-return_name = partial(return_attribute, attribute="name")
-return_examined = partial(return_attribute, attribute="when_examined")
-return_contents = partial(return_attribute, attribute="contents")
-return_encountered = partial(return_attribute, attribute="when_encountered")
-return_key_to = partial(return_attribute, attribute="key_to")
 
 
 def setup_game(game_info):
@@ -27,7 +13,6 @@ def setup_game(game_info):
     )
 
     set_player_location(new_game.start)
-
     return new_game
 
 
@@ -103,20 +88,20 @@ def flip_compass(initial) -> Compass:
 
 
 def describe_room(room: Room) -> str:
-    desc: str = return_name(room)
-    desc += "\n" + return_examined(room)
+    desc: str = getattr(room, "name")
+    desc += "\n" + getattr(room, "when_examined")
     desc += _room_placed_description(room)
     return desc.rstrip()
 
 
 def _room_placed_description(room: Room) -> str:
-    extra: dict = return_contents(room)
+    extra: dict = getattr(room, "contents")
     desc: str = ""
     if extra:
         desc += "\n\n"
         for each in extra.values():
             if each.is_concealed is False:
-                desc += return_encountered(each) + " "
+                desc += getattr(each, "when_encountered") + " "
     return desc
 
 
@@ -277,7 +262,7 @@ def _resolve_multiple(results: list):
 
 def check_key_for(openable: Container):
     for each in _inventory().values():
-        unlock_id = id(return_key_to(each))
+        unlock_id = id(getattr(each, "key_to"))
         if unlock_id == id(openable):
             return each.name
     return False
