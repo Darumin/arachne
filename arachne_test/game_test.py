@@ -1,7 +1,7 @@
-import unittest
-import arachne.game as g
-
 from gc import get_objects
+import unittest
+
+from arachne import game as g
 
 
 class GameTestCase(unittest.TestCase):

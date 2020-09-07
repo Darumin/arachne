@@ -33,18 +33,6 @@ def handle_go(direction) -> str:
     return "Nothing that way."
 
 
-def bridge_paths(from_place, to_place, direction: Compass):
-    flipped = flip_compass(direction)
-    add_path_to(from_place, to_place, direction)
-    add_path_to(to_place, from_place, flipped)
-
-
-def bridge_doors(from_place, to_place, direction: Compass, door: Door):
-    flipped = flip_compass(direction)
-    add_door_to(from_place, to_place, direction, door)
-    add_door_to(to_place, from_place, flipped, door)
-
-
 def add_path_to(from_place, to_place, direction: Compass):
     from_place.adjacency[direction] = to_place
 
@@ -57,6 +45,18 @@ def add_door_to(from_place, to_place, direction: Compass, door: Door):
     add_path_to(from_place, to_place, direction)
     door.room_context[id(from_place)] = (to_place, direction)
     add_item_to(from_place, door)
+
+
+def bridge_paths(from_place, to_place, direction: Compass):
+    flipped = flip_compass(direction)
+    add_path_to(from_place, to_place, direction)
+    add_path_to(to_place, from_place, flipped)
+
+
+def bridge_doors(from_place, to_place, direction: Compass, door: Door):
+    flipped = flip_compass(direction)
+    add_door_to(from_place, to_place, direction, door)
+    add_door_to(to_place, from_place, flipped, door)
 
 
 def get_door():
