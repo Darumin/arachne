@@ -7,7 +7,7 @@ from arachne import game as g
 
 
 # test game building functions
-class UserFacingBehaviorsTestCase(unittest.TestCase):
+class PathingTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.a = n.Room('A')
         self.b = n.Room('B')
@@ -64,16 +64,23 @@ class ObjectStagingTestCase(unittest.TestCase):
         b.remove_item_from(self.box, self.key)
         self.assertTrue(len(self.box.contents) == 0, e)
 
-    # might deprecate!
     def test_free_item(self):
-        e = 'When called, should free `parent_container.`'
+        e = 'When adding items, should free `parent_container.`'
+        b.add_item_to(self.box, self.ite)
         b.add_item_to(self.roo, self.ite)
         case = self.ite.parent_container
-        b.free_item(self.ite)
-        self.assertTrue(case and self.ite.parent_container is None, e)
+        self.assertTrue(case is self.roo, e)
 
     def test_vicinity(self):
-        e = ''
+        e = 'Everything in vicinity is active unless concealed.'
         b.add_item_to(self.box, self.ite)
         b.add_item_to(self.roo, self.key, self.box)
         self.assertTrue(len(b.vicinity()) == 3, e)
+
+    def test_drop_on_floor(self):
+        e = 'Should edit to dropped description and add to current location.'
+        temp = self.ite.when_encountered
+        b.drop_on_floor(self.ite)
+        case_one = temp is not self.ite.when_encountered
+        case_two = len(self.roo.contents) == 1
+        self.assertNotEqual(case_one and case_two, e)

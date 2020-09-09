@@ -10,6 +10,7 @@ class Noun:
     is_locked: bool = False
     is_concealed: bool = False
     is_sealed: bool = False
+    parent_container: Any = None
 
     def __str__(self):
         return '<%s -> %i>' % (self.__class__.__name__, id(self))
@@ -45,7 +46,7 @@ class Room(Container):
 
 @dataclass
 class Item(Noun):
-    parent_container: Any = None
+    pass
 
 
 @dataclass

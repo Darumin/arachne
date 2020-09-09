@@ -13,7 +13,7 @@ class Game(object):
         return Game.__instance
 
     def __repr__(self):
-        return f"<GAME: {id(self)}, START: '{self.start}'>"
+        return 'game: `%i`, start_loc: `%s`' % (id(self), self.start)
 
 
 class Player:

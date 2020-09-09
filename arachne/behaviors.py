@@ -6,10 +6,10 @@ from arachne.game import Player, Game
 
 def setup_game(game_info):
     new_game = Game(
-        game_title=getattr(game_info, "game_title"),
-        byline=getattr(game_info, "byline"),
-        preface=getattr(game_info, "preface"),
-        start=getattr(game_info, "start")
+        game_title=getattr(game_info, 'game_title'),
+        byline=getattr(game_info, 'byline'),
+        preface=getattr(game_info, 'preface'),
+        start=getattr(game_info, 'start')
     )
 
     set_player_location(new_game.start)
@@ -30,7 +30,7 @@ def handle_go(direction) -> str:
             destination = compass_rose[direction]
         set_player_location(destination)
         return describe_room(destination)
-    return "Nothing that way."
+    return 'Nothing that way.'
 
 
 def add_path_to(from_place, to_place, direction: Compass):
@@ -67,7 +67,7 @@ def get_door():
 
 
 def max_routes_error(_f, _t, _d):
-    return f"Cannot draw path: `{_f.name} -> {_t.name}` \n`{_d.name}` is maxed!"
+    return f'Cannot draw path: `{_f.name} -> {_t.name}` \n`{_d.name}` is maxed!'
 
 
 def flip_compass(initial) -> Compass:
@@ -88,20 +88,20 @@ def flip_compass(initial) -> Compass:
 
 
 def describe_room(room: Room) -> str:
-    desc: str = getattr(room, "name")
-    desc += "\n" + getattr(room, "when_examined")
+    desc: str = getattr(room, 'name')
+    desc += "\n" + getattr(room, 'when_examined')
     desc += _room_placed_description(room)
     return desc.rstrip()
 
 
 def _room_placed_description(room: Room) -> str:
-    extra: dict = getattr(room, "contents")
+    extra: dict = getattr(room, 'contents')
     desc: str = ""
     if extra:
         desc += "\n\n"
         for each in extra.values():
             if each.is_concealed is False:
-                desc += getattr(each, "when_encountered") + " "
+                desc += getattr(each, 'when_encountered') + " "
     return desc
 
 
@@ -113,14 +113,14 @@ def describe_inventory() -> str:
     carrying: list = list(_inventory().values())
 
     if any(_inventory()):
-        description: str = "You are carrying... \n"
+        description: str = 'You are carrying... \n'
         if len(carrying) > 1:
             for item in carrying[:-1]:
                 description += item.name + ", "
-            description += "and " + carrying[-1].name + "."
+            description += 'and ' + carrying[-1].name + '.'
         else:
-            description += carrying[0].name + "."
-    else: description = "You are not carrying anything."
+            description += carrying[0].name + '.'
+    else: description = 'You are not carrying anything.'
     return description
 
 
@@ -173,6 +173,7 @@ def _get_all_open_containers() -> dict:
 
 def add_item_to(storage, *items):
     for item in items:
+        free_item(item)
         _add_item_to(storage, item)
 
 
@@ -183,7 +184,6 @@ def _add_item_to(storage, item):
     any subject may have contents containing items. The _Player's contents is inventory.
     see usage of subject in remove_from_container() as well
     """
-
     _key: int = id(item)
     if _key not in storage.contents:
         storage.contents[_key] = item
@@ -191,7 +191,8 @@ def _add_item_to(storage, item):
 
 
 def drop_on_floor(item: Item):
-    item.when_encountered = f"{item.name.capitalize()} is here."
+    free_item(item)
+    item.when_encountered = f'{item.name.capitalize()} is here.'
     room_dropped = get_player_location()
     _add_item_to(room_dropped, item)
 
@@ -202,26 +203,26 @@ def remove_item_from(storage, item: Item):
 
 def describe_contents(container: Container):
     if container.is_sealed:
-        return "\n\nIt is closed."
+        return '\n\nIt is closed.'
 
     if container.contents:
-        description = "\n\n"
+        description = '\n\n'
         values = iter(container.contents.values())
 
         if len(container.contents) == 1:
-            description += f"Inside is {next(values).name}."
+            description += f'Inside is {next(values).name}.'
         else:
             for item in values:
-                description += item.name + ", "
-            description = "\n\nInside it are: " + description[2:-2] + "."
+                description += item.name + ', '
+            description = '\n\nInside it are: ' + description[2:-2] + '.'
 
         return description
-    return "\n\nThere is nothing inside."
+    return '\n\nThere is nothing inside.'
 
 
 def guess_object(object_str: str) -> tuple:
     results: list = list()
-    if object_str == "": return Object.UNSPECIFIED, results
+    if object_str == '': return Object.UNSPECIFIED, results
 
     # check vicinity (everywhere except inventory) for closest matching subject
     vic: dict = vicinity()
@@ -243,7 +244,7 @@ def guess_object(object_str: str) -> tuple:
 
 
 def _typify_object(object_str: str, amount_found: int) -> Object:
-    if object_str == "all": return Object.ALL
+    if object_str == 'all': return Object.ALL
     if amount_found == 0: return Object.NONEXISTENT
     if amount_found > 1: return Object.MULTIPLE
     if check_inventory(object_str): return Object.POSSESSED
@@ -251,18 +252,18 @@ def _typify_object(object_str: str, amount_found: int) -> Object:
 
 
 def _resolve_multiple(results: list):
-    print("Which one?")
+    print('Which one?')
 
     for result in enumerate(results, start=1):
-        print(f"{result[0]})", result[1].name, end=" ")
+        print(f'{result[0]})', result[1].name, end=' ')
 
-    choice: str = input("\n>")
+    choice: str = input('\n>')
     return guess_object(choice)
 
 
 def check_key_for(openable: Container):
     for each in _inventory().values():
-        unlock_id = id(getattr(each, "key_to"))
+        unlock_id = id(getattr(each, 'key_to'))
         if unlock_id == id(openable):
             return each.name
     return False
@@ -270,7 +271,7 @@ def check_key_for(openable: Container):
 
 def lock_switch_output(verb: Verb, openable):
     if not openable.is_openable:
-        print("That is not something you can do that to.")
+        print('That is not something you can do that to.')
         return
 
     key_found = check_key_for(openable)
@@ -278,19 +279,19 @@ def lock_switch_output(verb: Verb, openable):
     if key_found:
         if verb is Verb.UNLOCK:
             if not openable.is_locked:
-                print("This is already unlocked.")
+                print('This is already unlocked.')
             else:
                 openable.is_locked, openable.is_sealed = False, False
-                print(f"You unlock {openable.name} with {key_found}.")
+                print(f'You unlock {openable.name} with {key_found}.')
 
         if verb is Verb.LOCK:
             if openable.is_locked:
-                print("This is already locked.")
+                print('This is already locked.')
             else:
                 openable.is_locked, openable.is_sealed = True, True
-                print(f"You lock {openable.name} with {key_found}.")
+                print(f'You lock {openable.name} with {key_found}.')
     else:
-        print("You can't do that without the right key.")
+        print('You can\'t do that without the right key.')
 
 
 def open_or_close_output(verb: Verb, openable) -> str:
@@ -298,16 +299,16 @@ def open_or_close_output(verb: Verb, openable) -> str:
     sealed = openable.is_sealed
 
     if locked and sealed:
-        return "It is locked."
+        return 'It is locked.'
 
     if verb is Verb.OPEN:
         if sealed:
             openable.is_sealed = False
-            return f"You open {openable.name}."
-        else: return f"{openable.name.capitalize()} is already open."
+            return f'You open {openable.name}.'
+        else: return f'{openable.name.capitalize()} is already open.'
 
     if verb is Verb.CLOSE:
         if not sealed:
             openable.is_sealed = True
-            return f"You close {openable.name}."
-        else: return f"{openable.name.capitalize()} is already closed."
+            return f'You close {openable.name}.'
+        else: return f'{openable.name.capitalize()} is already closed.'
